@@ -1,39 +1,51 @@
 import pandas as pd
 
-# Expected raw input columns (Flask should send these keys)
+# --------------------------------------------------------------------
+# Columns your trained pipeline expects BEFORE any transformations
+# --------------------------------------------------------------------
 INPUT_COLUMNS = [
-    "Bedrooms", "Bathrooms", "Size", "Area_Avg_Price",
-    "Property Type", "Area", "Postcode"
+    "Bedrooms",
+    "Bathrooms",
+    "Size",
+    "Area_Avg_Price",
+    "Property Type",
+    "Area",
+    "Postcode"
 ]
-
-def extract_str(v):
-    return "" if v is None else str(v).strip()
 
 def prepare_input(raw: dict) -> pd.DataFrame:
     """
-    Accepts raw form/json dict from Flask and returns DataFrame with raw columns.
-    The saved pipeline (model.pkl) will perform target-encoding and preprocessing.
+    Prepares raw form input values for the ML pipeline.
+    The returned DataFrame contains ONLY the 7 raw columns expected by
+    the fitted Pipeline (TargetEncoder + ColumnTransformer + Model).
+
+    No manual target encoding, scaling, or one-hot encoding is done here.
+    The loaded model pipeline handles all transformations.
     """
-    bedrooms = float(raw.get("Bedrooms", 0))
-    bathrooms = float(raw.get("Bathrooms", 0))
-    size = float(raw.get("Size", 0))
-    area_avg_price = float(raw.get("Area_Avg_Price", 0))
 
-    property_type = extract_str(raw.get("Property Type"))
-    area = extract_str(raw.get("Area"))
-    postcode = extract_str(raw.get("Postcode")).upper()
+    # Clean + convert fields
+    try:
+        bedrooms = float(raw["Bedrooms"])
+        bathrooms = float(raw["Bathrooms"])
+        size = float(raw["Size"])
+        area_avg_price = float(raw["Area_Avg_Price"])
+    except ValueError:
+        raise ValueError("Numeric fields must be valid numbers.")
 
-    data = {
-        "Bedrooms": [bedrooms],
-        "Bathrooms": [bathrooms],
-        "Size": [size],
-        "Area_Avg_Price": [area_avg_price],
-        "Property Type": [property_type],
-        "Area": [area],
-        "Postcode": [postcode],
-    }
+    property_type = str(raw["Property Type"]).strip()
+    area = str(raw["Area"]).strip()
+    postcode = str(raw["Postcode"]).strip().upper()
 
-    df = pd.DataFrame(data)
-    # ensure columns exist in expected order
-    df = df.reindex(columns=INPUT_COLUMNS)
-    return df
+    # Construct a DataFrame in the EXACT required order
+    df = pd.DataFrame([{
+        "Bedrooms": bedrooms,
+        "Bathrooms": bathrooms,
+        "Size": size,
+        "Area_Avg_Price": area_avg_price,
+        "Property Type": property_type,
+        "Area": area,
+        "Postcode": postcode
+    }])
+
+    # Enforce strict column order to match training expectations
+    return df[INPUT_COLUMNS]
