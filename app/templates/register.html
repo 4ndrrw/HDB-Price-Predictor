@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="flex justify-center items-start pt-20">
+
+    <div class="w-80 border rounded-lg p-6 shadow-sm">
+        <h2 class="text-center text-xl font-semibold mb-6">Register</h2>
+
+        <form method="POST">
+
+            <label class="text-sm">Username</label>
+            <input name="username" required class="w-full border rounded px-3 py-2 mb-4">
+
+            <label class="text-sm">Password</label>
+            <input name="password" type="password" required class="w-full border rounded px-3 py-2 mb-4">
+
+            <button class="w-full bg-gray-800 text-white py-2 rounded mb-3">Register</button>
+
+            <p class="text-center text-sm text-gray-500 mb-3">Or</p>
+
+            <a href="/login" class="w-full block text-center bg-gray-300 py-2 rounded">
+                Sign In
+            </a>
+
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}

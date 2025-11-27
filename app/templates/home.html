@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Hero Section -->
+<div class="text-center py-24">
+    <h1 class="text-4xl font-bold mb-4">Property Price ML</h1>
+    <p class="text-lg text-gray-600">
+        Accurate Housing Price Predictions <br>
+        Powered by Machine Learning
+    </p>
+
+    <a href="/predict" 
+       class="mt-6 inline-block bg-gray-900 text-white px-6 py-2 rounded">
+        Predict Now
+    </a>
+</div>
+
+<!-- Reasons Section -->
+<div class="py-10">
+    <h2 class="text-xl font-semibold">Why Use Property Price ML?</h2>
+    <p class="text-gray-500 mb-10">Smarter home-buying decisions powered by data and machine learning.</p>
+
+    <div class="grid grid-cols-3 gap-10">
+
+        <div>
+            <p class="font-semibold flex items-center gap-2 mb-2">📊 Intelligent Price Predictions</p>
+            <p class="text-sm text-gray-600">
+                Our model analyses key property features to estimate realistic market prices.
+            </p>
+        </div>
+
+        <div>
+            <p class="font-semibold flex items-center gap-2 mb-2">⚙ Simple Inputs, Accurate Results</p>
+            <p class="text-sm text-gray-600">
+                Just enter basic details — advanced feature engineering runs in the background.
+            </p>
+        </div>
+
+        <div>
+            <p class="font-semibold flex items-center gap-2 mb-2">📍 Location-Aware Insights</p>
+            <p class="text-sm text-gray-600">
+                Postcode patterns and neighbourhood trends provide context-aware predictions.
+            </p>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

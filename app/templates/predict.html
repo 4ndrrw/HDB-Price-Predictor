@@ -1,0 +1,120 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1 class="text-4xl font-bold text-center mb-3">Predict Property Price</h1>
+<p class="text-center text-gray-600 mb-10">
+    Enter your property details to receive an instant price estimate.
+</p>
+
+<!-- Steps Section -->
+<div class="grid grid-cols-3 gap-6 mb-12">
+    <div>
+        <p class="font-bold mb-2">Step 1</p>
+        <p class="text-sm text-gray-600">Enter basic property details.</p>
+    </div>
+    <div>
+        <p class="font-bold mb-2">Step 2</p>
+        <p class="text-sm text-gray-600">Model processes data automatically.</p>
+    </div>
+    <div>
+        <p class="font-bold mb-2">Step 3</p>
+        <p class="text-sm text-gray-600">Receive instant price estimate.</p>
+    </div>
+</div>
+
+<!-- Prediction Form Card -->
+<form method="POST" class="max-w-3xl mx-auto border rounded p-10 mb-12">
+
+    <label>Property Type</label>
+    <select name="property_type" class="w-full border rounded px-3 py-2 mb-4">
+        <option>Apartment</option>
+        <option>House</option>
+        <option>Studio</option>
+        <option>Other</option>
+    </select>
+
+    <label>Number of Bedrooms</label>
+    <input name="bedrooms" type="number" class="w-full border rounded px-3 py-2 mb-4">
+
+    <label>Number of Bathrooms</label>
+    <input name="bathrooms" type="number" class="w-full border rounded px-3 py-2 mb-4">
+
+    <label>Size (Square Feet)</label>
+    <input name="size" type="number" class="w-full border rounded px-3 py-2 mb-4">
+
+    <label>Postcode</label>
+    <input name="postcode" class="w-full border rounded px-3 py-2 mb-4">
+
+    <label>Area</label>
+    <input name="area" class="w-full border rounded px-3 py-2 mb-8">
+
+    <!-- Buttons -->
+    <div class="flex justify-between">
+        <button type="reset" class="px-6 py-2 bg-gray-300 rounded hover:bg-gray-400">Clear</button>
+        <button class="px-6 py-2 bg-gray-900 text-white rounded hover:bg-gray-700">
+            Predict
+        </button>
+    </div>
+</form>
+
+<!-- Prediction Result -->
+{% if result %}
+    <p class="mt-4 text-center font-semibold text-xl">
+        Estimated Property Price: £{{ "%.2f"|format(result) }}
+    </p>
+{% endif %}
+
+<!-- Divider -->
+<div class="border-t my-14"></div>
+
+<!-- History Section -->
+<h1 class="text-4xl font-bold mb-2">Prediction History</h1>
+<p class="text-gray-600 mb-8">
+    A record of your past predictions, stored securely in the app.
+</p>
+
+{% if records and records|length > 0 %}
+<table class="w-full border text-sm">
+    <thead class="bg-gray-100">
+        <tr>
+            <th class="border px-3 py-2">ID</th>
+            <th class="border px-3 py-2">Property Type</th>
+            <th class="border px-3 py-2">Bedrooms</th>
+            <th class="border px-3 py-2">Bathrooms</th>
+            <th class="border px-3 py-2">Size</th>
+            <th class="border px-3 py-2">Postcode</th>
+            <th class="border px-3 py-2">Predicted Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in records %}
+        <tr>
+            <td class="border px-3 py-2">{{ row.id }}</td>
+            <td class="border px-3 py-2">{{ row.property_type }}</td>
+            <td class="border px-3 py-2">{{ row.bedrooms }}</td>
+            <td class="border px-3 py-2">{{ row.bathrooms }}</td>
+            <td class="border px-3 py-2">{{ row.size }}</td>
+            <td class="border px-3 py-2">{{ row.postcode }}</td>
+            <td class="border px-3 py-2">
+              {% if row.predicted_price is not none %}
+                £{{ row.predicted_price | round(2) }}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="mt-6">
+    <a href="/clear_history" class="px-4 py-2 bg-gray-900 text-white rounded">
+        Clear History
+    </a>
+</div>
+
+{% else %}
+<p class="text-gray-500 italic">No predictions yet — try the form above!</p>
+{% endif %}
+
+{% endblock %}

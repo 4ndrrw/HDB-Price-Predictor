@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title or "Property Price ML" }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-white text-gray-900">
+
+    <!-- Top Navbar -->
+    <nav class="w-full py-4 shadow-sm">
+        <div class="max-w-7xl mx-auto flex justify-between items-center px-6">
+            <!-- Logo -->
+            <div class="text-2xl font-bold">✣</div>
+
+            <!-- Right Links -->
+            <div class="flex items-center space-x-6 text-sm">
+                <a href="/" class="hover:underline">Home</a>
+                <a href="/predict" class="hover:underline">Predict</a>
+
+                {% if session.get("user_id") %}
+                    <a href="/logout" class="px-3 py-1 bg-gray-800 text-white rounded">Log Out</a>
+                {% else %}
+                    <a href="/login" class="hover:underline">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>
