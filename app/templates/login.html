@@ -1,28 +1,33 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="flex justify-center items-start pt-20">
+<div class="flex justify-center">
+    <div class="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm p-8 space-y-6">
+        <div class="space-y-2 text-center">
+            <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Secure access</p>
+            <h2 class="text-2xl font-semibold">Login</h2>
+            <p class="text-sm text-gray-600">Welcome back. Sign in to continue predicting.</p>
+        </div>
 
-    <div class="w-80 border rounded-lg p-6 shadow-sm">
-        <h2 class="text-center text-xl font-semibold mb-6">Login</h2>
+        <form method="POST" class="space-y-4">
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-gray-700">Username</label>
+                <input name="username" required class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 transition" />
+            </div>
 
-        <form method="POST">
-            <label class="text-sm">Username</label>
-            <input name="username" required class="w-full border rounded px-3 py-2 mb-4">
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-gray-700">Password</label>
+                <input type="password" name="password" required class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 transition" />
+            </div>
 
-            <label class="text-sm">Password</label>
-            <input type="password" name="password" required class="w-full border rounded px-3 py-2 mb-4">
-
-            <button class="w-full bg-gray-800 text-white py-2 rounded mb-3">Sign In</button>
-
-            <p class="text-center text-sm text-gray-500 mb-3">Or</p>
-
-            <a href="/register" class="w-full block text-center bg-gray-300 py-2 rounded">
-                Register
-            </a>
+            <button class="w-full bg-black text-white py-2.5 rounded-md text-sm font-medium shadow-sm transition hover:-translate-y-0.5">Sign in</button>
         </form>
-    </div>
 
+        <div class="text-center space-y-2">
+            <p class="text-sm text-gray-500">No account yet?</p>
+            <a href="/register" class="inline-flex justify-center px-4 py-2 rounded-md border border-gray-300 text-sm font-medium text-gray-800 transition hover:bg-gray-100">Create an account</a>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

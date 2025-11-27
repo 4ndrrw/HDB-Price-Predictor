@@ -1,49 +1,111 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<!-- Hero Section -->
-<div class="text-center py-24">
-    <h1 class="text-4xl font-bold mb-4">Property Price ML</h1>
-    <p class="text-lg text-gray-600">
-        Accurate Housing Price Predictions <br>
-        Powered by Machine Learning
-    </p>
+<style>
+@layer utilities {
+    .animate-fade-up { opacity: 0; animation: fadeUp 0.9s ease forwards; }
+    .animate-fade { opacity: 0; animation: fadeIn 0.9s ease forwards; }
+    .animate-delay-1 { animation-delay: 0.12s; }
+    .animate-delay-2 { animation-delay: 0.22s; }
+    .animate-delay-3 { animation-delay: 0.32s; }
+    .animate-delay-4 { animation-delay: 0.42s; }
+    .interactive-card { transition: transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease; }
+    .interactive-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px -32px rgba(15, 23, 42, 0.35); border-color: rgba(15, 23, 42, 0.12); }
+    nav { opacity: 0; animation: fadeDown 0.75s ease forwards; }
+    nav a { position: relative; }
+    nav a::after { content: ""; position: absolute; left: 50%; bottom: -4px; width: 0; height: 2px; background: #0f172a; transition: width 220ms ease, left 220ms ease; }
+    nav a:hover::after { width: 100%; left: 0; }
+}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 
-    <a href="/predict" 
-       class="mt-6 inline-block bg-gray-900 text-white px-6 py-2 rounded">
-        Predict Now
-    </a>
-</div>
-
-<!-- Reasons Section -->
-<div class="py-10">
-    <h2 class="text-xl font-semibold">Why Use Property Price ML?</h2>
-    <p class="text-gray-500 mb-10">Smarter home-buying decisions powered by data and machine learning.</p>
-
-    <div class="grid grid-cols-3 gap-10">
-
-        <div>
-            <p class="font-semibold flex items-center gap-2 mb-2">📊 Intelligent Price Predictions</p>
-            <p class="text-sm text-gray-600">
-                Our model analyses key property features to estimate realistic market prices.
-            </p>
-        </div>
-
-        <div>
-            <p class="font-semibold flex items-center gap-2 mb-2">⚙ Simple Inputs, Accurate Results</p>
-            <p class="text-sm text-gray-600">
-                Just enter basic details — advanced feature engineering runs in the background.
-            </p>
-        </div>
-
-        <div>
-            <p class="font-semibold flex items-center gap-2 mb-2">📍 Location-Aware Insights</p>
-            <p class="text-sm text-gray-600">
-                Postcode patterns and neighbourhood trends provide context-aware predictions.
-            </p>
-        </div>
-
+<div class="relative overflow-hidden rounded-[28px] bg-white/40 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.45)]">
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-24 -right-32 h-72 w-72 rounded-full bg-gradient-to-br from-gray-200/70 via-white to-white blur-3xl"></div>
+        <div class="absolute -bottom-20 -left-24 h-72 w-72 rounded-full bg-gradient-to-tr from-gray-100 via-white to-white blur-3xl"></div>
     </div>
+
+    <!-- Hero -->
+    <section class="relative grid md:grid-cols-[1.05fr_0.95fr] gap-12 items-center px-8 md:px-12 py-10 md:py-14">
+        <div class="space-y-8 md:space-y-10">
+            <div class="inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500 animate-fade-up">
+                <span class="h-px w-8 bg-gray-300"></span>
+                <span>Data-led valuation</span>
+            </div>
+            <div class="space-y-5 animate-fade-up animate-delay-1">
+                <h1 class="text-4xl md:text-5xl font-semibold leading-tight">Property Price ML</h1>
+                <p class="text-lg text-gray-600 max-w-2xl">Clean, confidence-building price predictions for every property detail you enter.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-4 animate-fade-up animate-delay-2">
+                <a href="/predict" class="inline-flex items-center justify-center px-7 py-3.5 rounded-md bg-black text-white shadow-sm hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] transition-all duration-300">Start a Prediction</a>
+                <a href="/login" class="inline-flex items-center justify-center px-7 py-3.5 rounded-md border border-gray-300 text-gray-800 hover:bg-gray-100 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300">Sign in</a>
+            </div>
+        </div>
+
+        <div class="bg-white/80 rounded-2xl shadow-lg shadow-gray-900/5 border border-gray-200/80 p-9 md:p-10 space-y-7 backdrop-blur animate-fade-up animate-delay-3">
+            <div class="flex items-start justify-between gap-4">
+                <div class="space-y-1.5">
+                    <p class="text-sm font-semibold text-gray-500">Confidence snapshot</p>
+                    <p class="text-2xl font-semibold text-gray-900">Transparent inputs, readable outputs</p>
+                </div>
+                <span class="px-3 py-1.5 rounded-full bg-gray-100 text-xs font-medium text-gray-600">Minimal UI</span>
+            </div>
+            <div class="space-y-5 text-sm text-gray-600">
+                <div class="flex items-center space-x-4 group transition-all">
+                    <span class="h-11 w-11 flex items-center justify-center rounded-full bg-gray-100 font-semibold group-hover:bg-black group-hover:text-white transition-all">01</span>
+                    <div class="space-y-1">
+                        <p class="font-semibold text-gray-900">Curated form</p>
+                        <p>Only the essentials: type, rooms, size, postcode, area.</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4 group transition-all">
+                    <span class="h-11 w-11 flex items-center justify-center rounded-full bg-gray-100 font-semibold group-hover:bg-black group-hover:text-white transition-all">02</span>
+                    <div class="space-y-1">
+                        <p class="font-semibold text-gray-900">Instant response</p>
+                        <p>Submit once and view the estimate plus your saved history.</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4 group transition-all">
+                    <span class="h-11 w-11 flex items-center justify-center rounded-full bg-gray-100 font-semibold group-hover:bg-black group-hover:text-white transition-all">03</span>
+                    <div class="space-y-1">
+                        <p class="font-semibold text-gray-900">Stay organized</p>
+                        <p>History stays on-page with quick clearing when you need it.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
+
+<!-- Why section -->
+<section class="mt-14 md:mt-16 space-y-8">
+    <div class="flex flex-col md:flex-row items-start justify-between gap-4 animate-fade-up animate-delay-1">
+        <div class="space-y-2">
+            <h2 class="text-2xl md:text-3xl font-semibold">Why use Property Price ML?</h2>
+            <p class="text-gray-600 max-w-2xl">A minimal, data-forward flow that keeps you focused on decisions, not decoration.</p>
+        </div>
+        <div class="hidden md:block text-sm text-gray-500">Neutral palette, clear hierarchy, subtle rhythm.</div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-7">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-7 space-y-3 interactive-card animate-fade-up animate-delay-1">
+            <p class="text-sm font-semibold text-gray-500">Model clarity</p>
+            <p class="text-lg font-semibold">Intelligent price predictions</p>
+            <p class="text-sm text-gray-600">Features are surfaced cleanly so the model can translate them into reliable valuations.</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-7 space-y-3 interactive-card animate-fade-up animate-delay-2">
+            <p class="text-sm font-semibold text-gray-500">Lean inputs</p>
+            <p class="text-lg font-semibold">Simple inputs, accurate results</p>
+            <p class="text-sm text-gray-600">A focused form means fewer distractions and faster entry with strong defaults.</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-7 space-y-3 interactive-card animate-fade-up animate-delay-3">
+            <p class="text-sm font-semibold text-gray-500">Location-aware</p>
+            <p class="text-lg font-semibold">Context-rich insights</p>
+            <p class="text-sm text-gray-600">Postcode and area sit alongside structure details to shape context-aware predictions.</p>
+        </div>
+    </div>
+</section>
 
 {% endblock %}
