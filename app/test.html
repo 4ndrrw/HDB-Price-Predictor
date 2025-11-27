@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Backend Test - /predict</title>
+  <style>
+    body { font-family: system-ui,Segoe UI,Roboto,Arial; padding:20px; max-width:760px; }
+    label { display:block; margin:8px 0 4px; font-weight:600; }
+    input, select, button { padding:8px; width:100%; box-sizing:border-box; }
+    .row { display:flex; gap:12px; }
+    .row > * { flex:1; }
+    #result { margin-top:16px; white-space:pre-wrap; background:#f7f7f7; padding:12px; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <h1>Test /predict</h1>
+
+  <!-- Form - values below are defaults you can change -->
+  <form id="predictForm" action="/predict" method="POST">
+    <div class="row">
+      <div>
+        <label for="bedrooms">Bedrooms</label>
+        <input id="bedrooms" name="bedrooms" type="number" value="2" min="0" />
+      </div>
+      <div>
+        <label for="bathrooms">Bathrooms</label>
+        <input id="bathrooms" name="bathrooms" type="number" value="1" min="0" />
+      </div>
+    </div>
+
+    <label for="size">Size (sq ft)</label>
+    <input id="size" name="size" type="number" value="750" />
+
+    <label for="area_avg_price">Area Avg Price</label>
+    <input id="area_avg_price" name="area_avg_price" type="number" value="600000" />
+
+    <label for="property_type">Property Type</label>
+    <select id="property_type" name="property_type">
+      <option>Apartment</option>
+      <option>House</option>
+      <option>Studio</option>
+      <option>Other</option>
+    </select>
+
+    <label for="area">Area</label>
+    <input id="area" name="area" type="text" value="Chelsea" />
+
+    <label for="postcode">Postcode</label>
+    <input id="postcode" name="postcode" type="text" value="SW1A 2AA" />
+
+    <label style="margin-top:12px;">
+      <input id="sendJson" type="checkbox" /> Send JSON (instead of form-encoded)
+    </label>
+
+    <div style="display:flex; gap:8px; margin-top:12px;">
+      <button id="submitBtn" type="submit" style="flex:1;">Send to /predict</button>
+      <button id="resetBtn" type="button" style="flex:1;">Reset</button>
+    </div>
+  </form>
+
+  <div id="result">Response will appear here</div>
+
+  <script>
+    const form = document.getElementById('predictForm');
+    const result = document.getElementById('result');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function formToObject(frm) {
+      const data = {};
+      new FormData(frm).forEach((v,k) => { data[k] = v; });
+      return data;
+    }
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      result.textContent = 'Sending...';
+
+      const useJson = document.getElementById('sendJson').checked;
+      const dataObj = formToObject(form);
+
+      try {
+        let resp;
+        if (useJson) {
+          resp = await fetch(form.action, {
+            method: form.method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataObj)
+          });
+        } else {
+          const params = new URLSearchParams();
+          for (const k in dataObj) params.append(k, dataObj[k]);
+          resp = await fetch(form.action, {
+            method: form.method,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+          });
+        }
+
+        const ct = resp.headers.get('content-type') || '';
+        if (ct.includes('application/json')) {
+          const json = await resp.json();
+          result.textContent = JSON.stringify(json, null, 2);
+        } else {
+          const text = await resp.text();
+          result.textContent = text;
+        }
+      } catch (err) {
+        result.textContent = 'Error: ' + err;
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
+      form.reset();
+      result.textContent = 'Response will appear here';
+    });
+  </script>
+</body>
+</html>

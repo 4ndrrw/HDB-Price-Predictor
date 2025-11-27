@@ -21,3 +21,7 @@ def predict():
     PredictionHistory.save(form, prediction)
 
     return render_template("index.html", result=prediction)
+
+@main_bp.route("/test")
+def test_page():
+    return open("app/test.html").read()
