@@ -15,12 +15,14 @@ def index():
 def predict():
     form = request.form.to_dict()
     X = prepare_input(form)
+
     prediction = model.predict(X)[0]
 
     # Save history
     PredictionHistory.save(form, prediction)
 
-    return render_template("index.html", result=prediction)
+    # TEMPORARY — avoids template error
+    return f"Predicted price: {prediction}"
 
 @main_bp.route("/test")
 def test_page():
