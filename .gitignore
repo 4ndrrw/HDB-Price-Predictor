@@ -1,0 +1,84 @@
+#############################################
+# Python Bytecode / Cache
+#############################################
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+#############################################
+# Jupyter Notebook Checkpoints
+#############################################
+.ipynb_checkpoints/
+
+#############################################
+# Virtual Environments
+#############################################
+env/
+venv/
+.venv/
+ENV/
+.env/
+env.bak/
+
+#############################################
+# Flask Instance Folder / Config
+#############################################
+instance/
+*.db-journal
+
+#############################################
+# Logs
+#############################################
+*.log
+logs/
+
+#############################################
+# System / OS / Editor Junk
+#############################################
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# VSCode
+.vscode/
+.code-workspace
+
+# PyCharm
+.idea/
+
+#############################################
+# Data Files
+#############################################
+# Ignore all large data except the exact dataset you want to keep
+*.csv
+*.xlsx
+*.xls
+*.tsv
+*.json
+*.parquet
+*.zip
+*.gz
+
+# KEEP your training dataset:
+!app/ml/data/London Property Listings Dataset.csv
+
+#############################################
+# Model Files
+#############################################
+# By default ignore model artifacts...
+# *.pkl
+# *.joblib
+# *.sav
+# *.h5
+
+# ...but KEEP all your .pkl model files (no ignoring)
+# (Remove the ignore rule entirely)
+# So do NOT ignore *.pkl at all.
+
+#############################################
+# Build / Dist folders
+#############################################
+build/
+dist/
+*.egg-info/
