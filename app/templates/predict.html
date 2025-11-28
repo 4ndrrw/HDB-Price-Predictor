@@ -1,158 +1,168 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<style>
-@layer utilities {
-    .animate-fade-up { opacity: 0; animation: fadeUp 0.9s ease forwards; }
-    .animate-fade { opacity: 0; animation: fadeIn 0.9s ease forwards; }
-    .animate-pop { opacity: 0; animation: popIn 0.8s ease forwards; }
-    .animate-delay-1 { animation-delay: 0.12s; }
-    .animate-delay-2 { animation-delay: 0.24s; }
-    .animate-delay-3 { animation-delay: 0.36s; }
-    .animate-delay-4 { animation-delay: 0.48s; }
-    nav { opacity: 0; animation: fadeDown 0.75s ease forwards; }
-    nav a { position: relative; }
-    nav a::after { content: ""; position: absolute; left: 50%; bottom: -4px; width: 0; height: 2px; background: #0f172a; transition: width 220ms ease, left 220ms ease; }
-    nav a:hover::after { width: 100%; left: 0; }
-    tbody tr { animation: tableEnter 0.7s ease forwards; opacity: 0; }
-    tbody tr:first-child { animation: tableEnter 0.7s ease forwards, rowHighlight 1.2s ease forwards 0.15s; }
-}
-@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes fadeDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes popIn { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes tableEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes rowHighlight { 0% { box-shadow: inset 0 0 0 9999px rgba(16, 185, 129, 0.08); } 100% { box-shadow: inset 0 0 0 9999px rgba(16, 185, 129, 0); } }
-</style>
+<section class="relative max-w-6xl mx-auto space-y-20 md:space-y-22">
 
-<section class="space-y-14 md:space-y-16 relative overflow-hidden rounded-[28px] bg-white/40 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.45)]">
-    <div class="absolute inset-0 pointer-events-none">
-        <div class="absolute -top-28 -right-24 h-72 w-72 rounded-full bg-gradient-to-br from-gray-200/70 via-white to-white blur-3xl"></div>
-        <div class="absolute -bottom-24 -left-28 h-72 w-72 rounded-full bg-gradient-to-tr from-gray-100 via-white to-white blur-3xl"></div>
-    </div>
-
-    <div class="relative space-y-14 md:space-y-16 px-8 md:px-12 py-12 md:py-14">
-        <div class="space-y-4 animate-fade-up">
-            <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Predict</p>
-            <h1 class="text-3xl md:text-4xl font-semibold">Predict property price</h1>
-            <p class="text-gray-600 max-w-3xl">Enter the essentials once, see your estimate instantly, and keep the history below for quick reference.</p>
+    <!-- Soft background container -->
+    <div class="relative overflow-hidden rounded-[28px] bg-white/55 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.5)] animate-fade-up reveal-on-scroll">
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute -top-28 -right-24 h-72 w-72 rounded-full bg-gradient-to-br from-gray-200/70 via-white to-white blur-3xl"></div>
+            <div class="absolute -bottom-28 -left-28 h-80 w-80 rounded-full bg-gradient-to-tr from-gray-100 via-white to-white blur-3xl"></div>
         </div>
 
-        <div class="bg-white/85 border border-gray-200 rounded-2xl shadow-lg shadow-gray-900/5 p-9 md:p-10 space-y-8 backdrop-blur animate-fade-up animate-delay-1">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <p class="text-sm font-semibold text-gray-700">New prediction</p>
-                    <p class="text-sm text-gray-600">Clean form, focused inputs.</p>
-                </div>
-                <div class="flex items-center space-x-3 text-xs text-gray-500">
-                    <span class="h-px w-6 bg-gray-300"></span>
-                    <span>Step 1: fill / Step 2: submit / Step 3: review</span>
-                </div>
+        <div class="relative px-8 md:px-12 py-14 md:py-18 space-y-10 md:space-y-12">
+            <!-- Header -->
+            <div class="space-y-3">
+                <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Predict</p>
+                <h1 class="text-3xl md:text-4xl font-semibold">Predict property price</h1>
+                <p class="text-gray-600 max-w-3xl">
+                    Enter the essentials once, see your estimate instantly, and keep the history below for quick reference.
+                </p>
             </div>
 
-            <form method="POST" class="space-y-7">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700">Property Type</label>
-                        <select name="property_type" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-all duration-300 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 focus:shadow-lg focus:shadow-black/5">
-                            <option>Apartment</option>
-                            <option>House</option>
-                            <option>Studio</option>
-                            <option>Other</option>
-                        </select>
+            <!-- Form card -->
+            <div class="bg-white/85 border border-gray-200 rounded-2xl shadow-lg shadow-gray-900/5 p-9 md:p-10 space-y-8 backdrop-blur animate-fade-up animate-delay-1">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-700">New prediction</p>
+                        <p class="text-sm text-gray-600">Clean form, focused inputs.</p>
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700">Number of Bedrooms</label>
-                        <input name="bedrooms" type="number" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-all duration-300 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 focus:shadow-lg focus:shadow-black/5" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700">Number of Bathrooms</label>
-                        <input name="bathrooms" type="number" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-all duration-300 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 focus:shadow-lg focus:shadow-black/5" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700">Size (Square Feet)</label>
-                        <input name="size" type="number" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-all duration-300 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 focus:shadow-lg focus:shadow-black/5" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700">Postcode</label>
-                        <input name="postcode" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-all duration-300 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 focus:shadow-lg focus:shadow-black/5" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700">Area</label>
-                        <input name="area" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-all duration-300 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 focus:shadow-lg focus:shadow-black/5" />
+                    <div class="flex items-center space-x-3 text-xs text-gray-500">
+                        <span class="h-px w-6 bg-gray-300"></span>
+                        <span>Step 1: fill • Step 2: submit • Step 3: review</span>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap justify-end gap-3 pt-2">
-                    <button type="reset" class="px-4 py-2.5 rounded-md border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-100 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300">Clear</button>
-                    <button class="px-5 py-2.5 rounded-md bg-black text-white text-sm font-medium shadow-sm hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97] transition-all duration-300">Predict</button>
-                </div>
-            </form>
+                <form method="POST" class="space-y-7">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Property Type</label>
+                            <select name="property_type"
+                                    class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-all duration-300 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 focus:shadow-lg focus:shadow-black/5">
+                                <option>Apartment</option>
+                                <option>House</option>
+                                <option>Studio</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
 
-            {% if result %}
-            <div class="rounded-xl border border-gray-200 bg-gray-50 p-5 flex items-center justify-between animate-pop animate-delay-2">
-                <div class="space-y-1">
-                    <p class="text-sm font-semibold text-gray-700">Estimated property price</p>
-                    <p class="text-xl font-semibold text-gray-900">A${ "%.2f"|format(result) }</p>
-                </div>
-                <span class="text-xs text-gray-500">Generated now</span>
-            </div>
-            {% endif %}
-        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Number of Bedrooms</label>
+                            <input name="bedrooms" type="number" min="0"
+                                   class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-all duration-300 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 focus:shadow-lg focus:shadow-black/5" />
+                        </div>
 
-        <div class="bg-white/85 border border-gray-200 rounded-2xl shadow-lg shadow-gray-900/5 p-9 md:p-10 space-y-6 backdrop-blur animate-fade-up animate-delay-2">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <p class="text-sm font-semibold text-gray-700">Prediction history</p>
-                    <p class="text-sm text-gray-600">All previous submissions in one place.</p>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Number of Bathrooms</label>
+                            <input name="bathrooms" type="number" min="0"
+                                   class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-all duration-300 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 focus:shadow-lg focus:shadow-black/5" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Size (Square Feet)</label>
+                            <input name="size" type="number" min="0" step="1"
+                                   class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-all duration-300 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 focus:shadow-lg focus:shadow-black/5" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Postcode</label>
+                            <input name="postcode"
+                                   class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-all duration-300 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 focus:shadow-lg focus:shadow-black/5" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Area</label>
+                            <input name="area"
+                                   class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-all duration-300 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/15 focus:shadow-lg focus:shadow-black/5" />
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap justify-end gap-3 pt-1">
+                        <button type="reset"
+                                class="px-4 py-2.5 rounded-md border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-100 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300">
+                            Clear
+                        </button>
+                        <button
+                                class="px-5 py-2.5 rounded-md bg-black text-white text-sm font-medium shadow-sm hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97] transition-all duration-300">
+                            Predict
+                        </button>
+                    </div>
+                </form>
+
+                {% if result %}
+                <div class="rounded-xl border border-gray-200 bg-gray-50 p-5 flex items-center justify-between animate-pop animate-delay-2">
+                    <div class="space-y-1">
+                        <p class="text-sm font-semibold text-gray-700">Estimated property price</p>
+                        <p class="text-xl font-semibold text-gray-900">
+                            A${ "%.2f"|format(result) }
+                        </p>
+                    </div>
+                    <span class="text-xs text-gray-500">Generated just now</span>
                 </div>
-                {% if records and records|length > 0 %}
-                <a href="/clear_history" class="inline-flex items-center px-4 py-2.5 rounded-md border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-100 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300">Clear history</a>
                 {% endif %}
             </div>
+        </div>
 
+    </div>
+
+    <!-- History card (separate block for breathing room) -->
+    <div class="bg-white/85 border border-gray-200 rounded-2xl shadow-lg shadow-gray-900/5 p-9 md:p-10 space-y-6 backdrop-blur reveal-on-scroll">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <p class="text-sm font-semibold text-gray-700">Prediction history</p>
+                <p class="text-sm text-gray-600">All previous submissions in one place.</p>
+            </div>
             {% if records and records|length > 0 %}
-            <div class="overflow-hidden border border-gray-200 rounded-xl animate-fade-up animate-delay-3">
-                <table class="min-w-full text-sm text-left">
-                    <thead class="bg-gray-100 text-gray-700">
-                        <tr>
-                            <th class="px-4 py-3 font-semibold">ID</th>
-                            <th class="px-4 py-3 font-semibold">Property Type</th>
-                            <th class="px-4 py-3 font-semibold">Bedrooms</th>
-                            <th class="px-4 py-3 font-semibold">Bathrooms</th>
-                            <th class="px-4 py-3 font-semibold">Size</th>
-                            <th class="px-4 py-3 font-semibold">Postcode</th>
-                            <th class="px-4 py-3 font-semibold">Predicted Price</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        {% for row in records %}
-                        <tr class="odd:bg-white even:bg-gray-50 transition-all duration-300 hover:-translate-y-[1px] hover:bg-gray-100/60">
-                            <td class="px-4 py-3 text-gray-700">{{ row.id }}</td>
-                            <td class="px-4 py-3 text-gray-700">{{ row.property_type }}</td>
-                            <td class="px-4 py-3 text-gray-700">{{ row.bedrooms }}</td>
-                            <td class="px-4 py-3 text-gray-700">{{ row.bathrooms }}</td>
-                            <td class="px-4 py-3 text-gray-700">{{ row.size }}</td>
-                            <td class="px-4 py-3 text-gray-700">{{ row.postcode }}</td>
-                            <td class="px-4 py-3 text-gray-900 font-semibold">
-                                {% if row.predicted_price is not none %}
-                                    A${{ row.predicted_price | round(2) }}
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-7 text-sm text-gray-600 animate-fade-up animate-delay-3">
-                No predictions yet. Use the form above to generate your first estimate.
-            </div>
+            <a href="/clear_history"
+               class="inline-flex items-center px-4 py-2.5 rounded-md border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-100 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300">
+                Clear history
+            </a>
             {% endif %}
         </div>
+
+        {% if records and records|length > 0 %}
+        <div class="overflow-hidden border border-gray-200 rounded-xl">
+            <table class="min-w-full text-sm text-left">
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr>
+                        <th class="px-4 py-3 font-semibold">ID</th>
+                        <th class="px-4 py-3 font-semibold">Property Type</th>
+                        <th class="px-4 py-3 font-semibold">Bedrooms</th>
+                        <th class="px-4 py-3 font-semibold">Bathrooms</th>
+                        <th class="px-4 py-3 font-semibold">Size</th>
+                        <th class="px-4 py-3 font-semibold">Postcode</th>
+                        <th class="px-4 py-3 font-semibold">Predicted Price</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for row in records %}
+                    <tr class="odd:bg-white even:bg-gray-50 transition-all duration-300 hover:-translate-y-[1px] hover:bg-gray-100/60"
+                        style="animation: tableEnter 0.6s var(--ease-soft) forwards; animation-delay: {{ loop.index0 * 0.03 }}s;">
+                        <td class="px-4 py-3 text-gray-700">{{ row.id }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ row.property_type }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ row.bedrooms }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ row.bathrooms }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ row.size }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ row.postcode }}</td>
+                        <td class="px-4 py-3 text-gray-900 font-semibold">
+                            {% if row.predicted_price is not none %}
+                                A${{ row.predicted_price | round(2) }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-7 text-sm text-gray-600">
+            No predictions yet. Use the form above to generate your first estimate.
+        </div>
+        {% endif %}
     </div>
+
 </section>
 
 {% endblock %}

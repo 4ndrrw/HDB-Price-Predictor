@@ -1,33 +1,198 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<style>
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+  }
+  .shake {
+    animation: shake 0.3s ease;
+  }
+</style>
+
 <div class="flex justify-center">
-    <div class="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm p-8 space-y-6">
-        <div class="space-y-2 text-center">
-            <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Secure access</p>
-            <h2 class="text-2xl font-semibold">Login</h2>
-            <p class="text-sm text-gray-600">Welcome back. Sign in to continue predicting.</p>
-        </div>
+  <div class="w-full max-w-md bg-white border border-gray-200 rounded-[28px] shadow-[0_40px_90px_-60px_rgba(15,23,42,0.45)] p-8 md:p-10 space-y-7 animate-fade-up">
 
-        <form method="POST" class="space-y-4">
-            <div class="space-y-2">
-                <label class="text-sm font-medium text-gray-700">Username</label>
-                <input name="username" required class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 transition" />
-            </div>
-
-            <div class="space-y-2">
-                <label class="text-sm font-medium text-gray-700">Password</label>
-                <input type="password" name="password" required class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 transition" />
-            </div>
-
-            <button class="w-full bg-black text-white py-2.5 rounded-md text-sm font-medium shadow-sm transition hover:-translate-y-0.5">Sign in</button>
-        </form>
-
-        <div class="text-center space-y-2">
-            <p class="text-sm text-gray-500">No account yet?</p>
-            <a href="/register" class="inline-flex justify-center px-4 py-2 rounded-md border border-gray-300 text-sm font-medium text-gray-800 transition hover:bg-gray-100">Create an account</a>
-        </div>
+    <!-- Header -->
+    <div class="space-y-2 text-center">
+      <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">
+        Secure access
+      </p>
+      <h2 class="text-2xl md:text-3xl font-semibold">Login</h2>
+      <p class="text-sm text-gray-600">
+        Welcome back. Sign in to continue predicting.
+      </p>
     </div>
+
+    <form id="loginForm" method="POST" class="space-y-5">
+
+      <!-- USERNAME -->
+      <div id="usernameGroup" class="space-y-2">
+        <label class="text-sm font-medium text-gray-700">Username</label>
+
+        <input
+          id="login_username"
+          name="username"
+          autocomplete="username"
+          class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm input-focus transition"
+        />
+
+        {% with errors = get_flashed_messages(category_filter=['login_username_error']) %}
+          {% if errors %}
+            <p id="usernameError" class="text-xs text-red-500">
+              {{ errors[0] }}
+            </p>
+          {% else %}
+            <p id="usernameError" class="hidden text-xs text-red-500"></p>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <!-- PASSWORD -->
+      <div id="passwordGroup" class="space-y-2">
+        <label class="text-sm font-medium text-gray-700">Password</label>
+
+        <div class="relative">
+          <input
+            id="login_password"
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm pr-10 input-focus transition"
+          />
+
+          <!-- Eye icon -->
+          <button
+            type="button"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+            onclick="toggleLoginPassword()"
+            tabindex="-1"
+          >
+            <svg id="loginPasswordIcon" class="h-4 w-4"
+                 xmlns="http://www.w3.org/2000/svg" fill="none"
+                 stroke="currentColor" stroke-width="1.7"
+                 viewBox="0 0 24 24">
+              <!-- default = closed eye -->
+              <path d="M3 3l18 18" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10.584 10.587A2 2 0 0 0 12 14a2 2 0 0 0 1.414-.586"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9.88 4.586A9.557 9.557 0 0 1 12 4.25c4.5 0 8.25 2.75 10 6.75a10.523 10.523 0 0 1-1.695 2.582"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6.228 6.228C4.37 7.342 2.95 9.138 2 11c1.75 4 5.5 6.75 10 6.75 1.184 0 2.324-.18 3.4-.515"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        {% with errors = get_flashed_messages(category_filter=['login_password_error']) %}
+          {% if errors %}
+            <p id="passwordError" class="text-xs text-red-500">
+              {{ errors[0] }}
+            </p>
+          {% else %}
+            <p id="passwordError" class="hidden text-xs text-red-500"></p>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <!-- SUBMIT -->
+      <button
+        class="w-full bg-black text-white py-2.5 rounded-md text-sm font-medium shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97]">
+        Sign in
+      </button>
+
+      <!-- Divider -->
+      <div class="flex items-center gap-4 text-xs text-gray-400 pt-2">
+        <span class="flex-1 h-px bg-gray-200"></span>
+        <span>or continue with</span>
+        <span class="flex-1 h-px bg-gray-200"></span>
+      </div>
+
+      <!-- SOCIAL LOGIN -->
+      <div class="space-y-3">
+        <button type="button"
+          class="w-full inline-flex items-center justify-center gap-2 border border-gray-300 rounded-md px-4 py-2.5 text-sm font-medium text-gray-800 bg-white hover:bg-gray-50 transition">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+               class="h-4 w-4" />
+          <span>Continue with Google</span>
+        </button>
+
+        <button type="button"
+          class="w-full inline-flex items-center justify-center gap-2 border border-gray-300 rounded-md px-4 py-2.5 text-sm font-medium text-gray-800 bg-white hover:bg-gray-50 transition">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
+               class="h-4 w-4" />
+          <span>Continue with Apple</span>
+        </button>
+      </div>
+
+    </form>
+
+    <div class="pt-2 text-center space-y-2">
+      <p class="text-sm text-gray-500">No account yet?</p>
+      <a href="/register"
+         class="inline-flex justify-center px-4 py-2 rounded-md border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-100 transition">
+        Create an account
+      </a>
+    </div>
+
+  </div>
 </div>
+
+<!-- JS -->
+<script>
+  function shake(el) {
+    el.classList.remove("shake");
+    void el.offsetWidth;
+    el.classList.add("shake");
+  }
+
+  function toggleLoginPassword() {
+    const input = document.getElementById("login_password");
+    const icon = document.getElementById("loginPasswordIcon");
+    const hidden = input.type === "password";
+
+    input.type = hidden ? "text" : "password";
+
+    icon.innerHTML = hidden
+    ? `
+        <!-- open eye -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+            fill="none" stroke="currentColor" stroke-width="1.7"
+            viewBox="0 0 24 24">
+        <path d="M2 12s3.5-6.5 10-6.5 10 6.5 10 6.5-3.5 6.5-10 6.5S2 12 2 12Z"/>
+        <circle cx="12" cy="12" r="3.5"/>
+        </svg>`
+    : `
+        <!-- closed eye -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+            fill="none" stroke="currentColor" stroke-width="1.7"
+            viewBox="0 0 24 24">
+        <path d="M3 3l18 18" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10.584 10.587A2 2 0 0 0 12 14a2 2 0 0 0 1.414-.586"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9.88 4.586A9.557 9.557 0 0 1 12 4.25c4.5 0 8.25 2.75 10 6.75a10.523 10.523 0 0 1-1.695 2.582"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6.228 6.228C4.37 7.342 2.95 9.138 2 11c1.75 4 5.5 6.75 10 6.75 1.184 0 2.324-.18 3.4-.515"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`;
+  }
+
+  /* Shake invalid fields on load (server-side errors) */
+  window.addEventListener("DOMContentLoaded", () => {
+    const userErr = document.getElementById("usernameError");
+    const passErr = document.getElementById("passwordError");
+
+    if (userErr && !userErr.classList.contains("hidden")) {
+      shake(document.getElementById("usernameGroup"));
+    }
+    if (passErr && !passErr.classList.contains("hidden")) {
+      shake(document.getElementById("passwordGroup"));
+    }
+  });
+</script>
 
 {% endblock %}

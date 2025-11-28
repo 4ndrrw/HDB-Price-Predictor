@@ -1,33 +1,391 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<style>
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+  }
+  .shake { animation: shake 0.3s ease; }
+
+  .fade-error { animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .input-focus:focus {
+    border-color: black;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
+  }
+</style>
+
 <div class="flex justify-center">
-    <div class="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm p-8 space-y-6">
-        <div class="space-y-2 text-center">
-            <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Create access</p>
-            <h2 class="text-2xl font-semibold">Register</h2>
-            <p class="text-sm text-gray-600">Set up your account to save and revisit predictions.</p>
-        </div>
+  <div class="w-full max-w-md bg-white border border-gray-200 rounded-[28px] shadow-[0_40px_90px_-60px_rgba(15,23,42,0.45)] p-8 md:p-10 space-y-7 animate-fade-up">
 
-        <form method="POST" class="space-y-4">
-            <div class="space-y-2">
-                <label class="text-sm font-medium text-gray-700">Username</label>
-                <input name="username" required class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 transition" />
-            </div>
-
-            <div class="space-y-2">
-                <label class="text-sm font-medium text-gray-700">Password</label>
-                <input name="password" type="password" required class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 transition" />
-            </div>
-
-            <button class="w-full bg-black text-white py-2.5 rounded-md text-sm font-medium shadow-sm transition hover:-translate-y-0.5">Register</button>
-        </form>
-
-        <div class="text-center space-y-2">
-            <p class="text-sm text-gray-500">Already registered?</p>
-            <a href="/login" class="inline-flex justify-center px-4 py-2 rounded-md border border-gray-300 text-sm font-medium text-gray-800 transition hover:bg-gray-100">Sign in</a>
-        </div>
+    <!-- Header -->
+    <div class="space-y-2 text-center">
+      <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Create access</p>
+      <h2 class="text-2xl md:text-3xl font-semibold">Register</h2>
+      <p class="text-sm text-gray-600">Set up your account to save and revisit predictions.</p>
     </div>
+
+    <form id="registerForm" method="POST" class="space-y-5" novalidate>
+      <!-- USERNAME -->
+      <div id="usernameGroup" class="space-y-2">
+        <label class="text-sm font-medium text-gray-700">Username</label>
+        <div class="relative">
+          <input id="username" name="username" autocomplete="off"
+                 class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm input-focus transition" />
+        </div>
+
+        <p id="usernameStatus" class="text-xs mt-1 text-gray-500">
+          Choose a unique name to identify your account.
+        </p>
+      </div>
+
+      <!-- PASSWORD -->
+      <div id="passwordGroup" class="space-y-2">
+        <label class="text-sm font-medium text-gray-700">Password</label>
+
+        <div class="relative">
+          <input id="password" name="password" type="password"
+                 class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm pr-10 input-focus transition" />
+
+          <button type="button"
+                  class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                  onclick="togglePasswordVisibility('password','passwordToggleIcon')" tabindex="-1">
+            <!-- closed eye default -->
+            <svg id="passwordToggleIcon" xmlns="http://www.w3.org/2000/svg"
+                 class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.7">
+              <path d="M3 3l18 18" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M10.584 10.587A2 2 0 0 0 12 14a2 2 0 0 0 1.414-.586"
+                    stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M9.88 4.586A9.557 9.557 0 0 1 12 4.25c4.5 0 8.25 2.75 10 6.75a10.523 10.523 0 0 1-1.695 2.582"
+                    stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M6.228 6.228C4.37 7.342 2.95 9.138 2 11c1.75 4 5.5 6.75 10 6.75
+                       1.184 0 2.324-.18 3.4-.515"
+                    stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Strength meter -->
+        <div class="mt-1 flex items-center justify-between text-xs">
+          <div class="w-full h-1.5 rounded-full bg-gray-200 overflow-hidden mr-3">
+            <div id="passwordStrengthBar"
+                 class="h-full w-0 bg-red-400 transition-all duration-300"></div>
+          </div>
+          <span id="passwordStrengthText" class="text-gray-500">Min 6 characters</span>
+        </div>
+
+        <p id="passwordError" class="text-xs text-red-500 hidden fade-error"></p>
+      </div>
+
+      <!-- CONFIRM PASSWORD -->
+      <div id="confirmGroup" class="space-y-2">
+        <label class="text-sm font-medium text-gray-700">Confirm password</label>
+
+        <div class="relative">
+          <input id="confirm_password" type="password"
+                 class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm pr-10 input-focus transition" />
+
+          <button type="button"
+                  class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                  onclick="togglePasswordVisibility('confirm_password','confirmToggleIcon')" tabindex="-1">
+
+            <svg id="confirmToggleIcon" xmlns="http://www.w3.org/2000/svg"
+                 class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.7">
+              <path d="M3 3l18 18" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M10.584 10.587A2 2 0 0 0 12 14a2 2 0 0 0 1.414-.586"
+                    stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M9.88 4.586A9.557 9.557 0 0 1 12 4.25c4.5 0 8.25 2.75 10 6.75a10.523 10.523 0 0 1-1.695 2.582"
+                    stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M6.228 6.228C4.37 7.342 2.95 9.138 2 11c1.75 4 5.5 6.75 10 6.75
+                       1.184 0 2.324-.18 3.4-.515"
+                    stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+
+          </button>
+        </div>
+
+        <p id="confirmError" class="mt-1 text-xs text-red-500 hidden fade-error">
+          Passwords do not match
+        </p>
+
+        <p id="confirmSuccess"
+           class="mt-1 text-xs text-emerald-600 hidden fade-error">
+          ✓ Passwords match
+        </p>
+      </div>
+
+      <!-- SUBMIT BUTTON -->
+      <button
+        class="w-full bg-black text-white py-2.5 rounded-md text-sm font-medium shadow-sm
+               transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97]">
+        Register
+      </button>
+
+      <!-- DIVIDER -->
+      <div class="flex items-center gap-4 text-xs text-gray-400 pt-1">
+        <span class="flex-1 h-px bg-gray-200"></span>
+        <span>or continue with</span>
+        <span class="flex-1 h-px bg-gray-200"></span>
+      </div>
+
+      <!-- SOCIAL BUTTONS -->
+      <div class="space-y-3 pt-1">
+        <button type="button"
+                class="w-full inline-flex items-center justify-center gap-2 border border-gray-300 rounded-md px-4 py-2.5 text-sm font-medium text-gray-800 bg-white hover:bg-gray-50 transition">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+               alt="Google" class="h-4 w-4" />
+          <span>Continue with Google</span>
+        </button>
+
+        <button type="button"
+                class="w-full inline-flex items-center justify-center gap-2 border border-gray-300 rounded-md px-4 py-2.5 text-sm font-medium text-gray-800 bg-white hover:bg-gray-50 transition">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
+               alt="Apple" class="h-4 w-4" />
+          <span>Continue with Apple</span>
+        </button>
+      </div>
+    </form>
+
+    <!-- Footer -->
+    <div class="pt-2 text-center space-y-2">
+      <p class="text-sm text-gray-500">Already registered?</p>
+      <a href="/login"
+         class="inline-flex justify-center px-4 py-2 rounded-md border border-gray-300 text-sm font-medium text-gray-800 hover:bg-gray-100 transition">
+        Sign in
+      </a>
+    </div>
+
+  </div>
 </div>
+
+<script>
+  /* -----------------------------------------
+     ELEMENTS
+  ----------------------------------------- */
+  const usernameInput = document.getElementById('username');
+  const usernameStatus = document.getElementById('usernameStatus');
+  const usernameGroup = document.getElementById('usernameGroup');
+
+  const passwordInput = document.getElementById('password');
+  const confirmInput = document.getElementById('confirm_password');
+  const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+  const passwordStrengthText = document.getElementById('passwordStrengthText');
+  const passwordError = document.getElementById('passwordError');
+  const confirmError = document.getElementById('confirmError');
+  const confirmSuccess = document.getElementById('confirmSuccess');
+
+  const form = document.getElementById('registerForm');
+
+  /* -----------------------------------------
+     SHAKE ANIMATION
+  ----------------------------------------- */
+  function shake(el) {
+    el.classList.remove('shake');
+    void el.offsetWidth;
+    el.classList.add('shake');
+  }
+
+  /* -----------------------------------------
+     TOGGLE PASSWORD VISIBILITY (WORKING ICONS)
+  ----------------------------------------- */
+  function togglePasswordVisibility(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+
+    const hidden = input.type === "password";
+    input.type = hidden ? "text" : "password";
+
+    icon.innerHTML = hidden
+      ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.7">
+           <path d="M2 12s3.5-6.5 10-6.5 10 6.5 10 6.5-3.5 6.5-10 6.5S2 12 2 12Z"
+                 stroke-linecap="round" stroke-linejoin="round"/>
+           <circle cx="12" cy="12" r="3.5"
+                   stroke-linecap="round" stroke-linejoin="round"/>
+         </svg>`
+      : `<svg xmlns="http://www.w3.org/2000/svg"
+               class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.7">
+           <path d="M3 3l18 18"
+                 stroke-linecap="round" stroke-linejoin="round" />
+           <path d="M10.584 10.587A2 2 0 0 0 12 14a2 2 0 0 0 1.414-.586"
+                 stroke-linecap="round" stroke-linejoin="round" />
+           <path d="M9.88 4.586A9.557 9.557 0 0 1 12 4.25c4.5 0 8.25 2.75 10 6.75a10.523 10.523 0 0 1-1.695 2.582"
+                 stroke-linecap="round" stroke-linejoin="round" />
+           <path d="M6.228 6.228C4.37 7.342 2.95 9.138 2 11c1.75 4 5.5 6.75 10 6.75
+                    1.184 0 2.324-.18 3.4-.515"
+                 stroke-linecap="round" stroke-linejoin="round" />
+         </svg>`;
+  }
+
+  /* -----------------------------------------
+     PASSWORD STRENGTH
+  ----------------------------------------- */
+  function evaluatePassword(pwd) {
+    const hasLetter = /[A-Za-z]/.test(pwd);
+    const hasNumber = /\d/.test(pwd);
+    const hasSymbol = /[^A-Za-z0-9]/.test(pwd);
+    const length = pwd.length;
+
+    let score = 0;
+    if (length >= 6) score++;
+    if (hasLetter && hasNumber) score++;
+    if (length >= 10 || (hasSymbol && length >= 8)) score++;
+
+    let error = '';
+    if (length > 0) {
+      if (length < 6) {
+        error = 'Password is too short (min 6 characters).';
+      } else if (!hasLetter || !hasNumber) {
+        error = 'Password must include both letters and numbers.';
+      }
+    }
+
+    return { score, error };
+  }
+
+  function updatePasswordUI() {
+    const pwd = passwordInput.value;
+    const { score, error } = evaluatePassword(pwd);
+
+    let width = '0%';
+    let color = 'bg-red-400';
+    let label = 'Min 6 characters';
+
+    if (pwd.length > 0) {
+      if (score <= 1) {
+        width = '33%'; color = 'bg-red-400'; label = 'Weak';
+      } else if (score === 2) {
+        width = '66%'; color = 'bg-amber-400'; label = 'Fair';
+      } else {
+        width = '100%'; color = 'bg-emerald-500'; label = 'Strong';
+      }
+    }
+
+    passwordStrengthBar.className = `h-full ${color} transition-all duration-300`;
+    passwordStrengthBar.style.width = width;
+    passwordStrengthText.textContent = label;
+
+    if (error) {
+      passwordError.textContent = error;
+      passwordError.classList.remove('hidden');
+    } else {
+      passwordError.textContent = '';
+      passwordError.classList.add('hidden');
+    }
+
+    validateConfirmPassword();
+  }
+
+  /* -----------------------------------------
+     CONFIRM PASSWORD VALIDATION
+  ----------------------------------------- */
+  function validateConfirmPassword() {
+    const pwd = passwordInput.value;
+    const confirm = confirmInput.value;
+
+    if (!confirm) {
+      confirmError.classList.add('hidden');
+      confirmSuccess.classList.add('hidden');
+      return;
+    }
+
+    if (pwd !== confirm) {
+      confirmError.classList.remove('hidden');
+      confirmSuccess.classList.add('hidden');
+    } else {
+      confirmError.classList.add('hidden');
+      confirmSuccess.classList.remove('hidden');
+    }
+  }
+
+  passwordInput.addEventListener('input', updatePasswordUI);
+  confirmInput.addEventListener('input', validateConfirmPassword);
+
+  /* -----------------------------------------
+     LIVE USERNAME CHECK (AJAX)
+  ----------------------------------------- */
+  let usernameTimeout = null;
+
+  usernameInput.addEventListener('input', () => {
+    const value = usernameInput.value.trim();
+
+    usernameStatus.classList.remove('text-red-500', 'text-emerald-600');
+    usernameStatus.classList.add('text-gray-500');
+    usernameStatus.textContent = 'Checking availability…';
+
+    if (usernameTimeout) clearTimeout(usernameTimeout);
+
+    if (!value) {
+      usernameStatus.textContent = 'Choose a unique name to identify your account.';
+      return;
+    }
+
+    usernameTimeout = setTimeout(() => {
+      fetch(`/api/check_username?username=${encodeURIComponent(value)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.exists) {
+            usernameStatus.textContent = 'Username already exists.';
+            usernameStatus.classList.remove('text-gray-500', 'text-emerald-600');
+            usernameStatus.classList.add('text-red-500');
+          } else {
+            usernameStatus.textContent = '✓ Username is available.';
+            usernameStatus.classList.remove('text-gray-500', 'text-red-500');
+            usernameStatus.classList.add('text-emerald-600');
+          }
+        })
+        .catch(() => {
+          usernameStatus.textContent = 'Unable to verify username.';
+          usernameStatus.classList.remove('text-gray-500');
+          usernameStatus.classList.add('text-red-500');
+        });
+    }, 250);
+  });
+
+  /* -----------------------------------------
+     FINAL FORM VALIDATION
+  ----------------------------------------- */
+  form.addEventListener('submit', (e) => {
+    let valid = true;
+    const pwd = passwordInput.value;
+
+    if (!usernameInput.value.trim() ||
+        usernameStatus.textContent.includes('already exists'))
+    {
+      valid = false;
+      shake(usernameGroup);
+    }
+
+    const { error } = evaluatePassword(pwd);
+    if (error) {
+      valid = false;
+      passwordError.textContent = error;
+      passwordError.classList.remove('hidden');
+      shake(passwordGroup);
+    }
+
+    if (pwd !== confirmInput.value) {
+      valid = false;
+      confirmError.classList.remove('hidden');
+      confirmSuccess.classList.add('hidden');
+      shake(confirmGroup);
+    }
+
+    if (!valid) e.preventDefault();
+  });
+</script>
 
 {% endblock %}
