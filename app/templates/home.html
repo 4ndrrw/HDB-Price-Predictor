@@ -1,129 +1,289 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<!-- Hero wrapper -->
-<div class="relative w-full mx-auto overflow-hidden rounded-[28px] bg-white/50 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.45)] animate-fade-up reveal-on-scroll">
-
-  <!-- Soft gradient blobs -->
-  <div class="absolute inset-0 pointer-events-none">
-    <div class="absolute -top-24 -right-32 h-72 w-72 rounded-full bg-gradient-to-br from-gray-200/70 via-white to-white blur-3xl"></div>
-    <div class="absolute -bottom-28 -left-28 h-80 w-80 rounded-full bg-gradient-to-tr from-gray-100 via-white to-white blur-3xl"></div>
+<!-- ============================================================
+     GLOBAL HYBRID-MINIMAL BACKGROUND (Apple + Vercel mesh)
+=============================================================== -->
+<div class="fixed inset-0 -z-20 w-full h-full pointer-events-none overflow-hidden">
+  <!-- Soft neutral radial gradient -->
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,
+                    rgba(255,255,255,0.95) 0%,
+                    rgba(248,248,248,0.85) 40%,
+                    rgba(242,242,242,0.92) 70%,
+                    rgba(238,238,238,1) 100%)]">
   </div>
 
-  <!-- Hero content -->
-  <section class="relative grid md:grid-cols-[1.2fr_0.8fr] gap-20 items-center px-6 md:px-10 py-18 md:py-20">
-    <!-- Left -->
-    <div class="space-y-8 md:space-y-10 pl-2 md:pl-6">
-      <div class="inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-[0.22em] text-gray-500">
-        <span class="h-px w-8 bg-gray-300"></span>
-        <span>Data-led valuation</span>
-      </div>
+  <!-- Subtle gray mesh -->
+  <div class="absolute inset-0 opacity-[0.045]
+              bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] 
+              mix-blend-soft-light">
+  </div>
 
-      <div class="space-y-4">
-        <h1 class="text-4xl md:text-5xl font-semibold leading-tight">
-          Property Price ML
-        </h1>
-        <p class="text-lg text-gray-600 max-w-2xl">
-          Clean, confidence-building price predictions for every property detail you enter.
-        </p>
-      </div>
-
-      <div class="flex flex-wrap items-center gap-4">
-        <a href="/predict"
-          class="inline-flex items-center justify-center px-7 py-3.5 rounded-md bg-black text-white shadow-sm hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97] transition-all duration-300">
-          Start a prediction
-        </a>
-        <a href="/login"
-          class="inline-flex items-center justify-center px-7 py-3.5 rounded-md border border-gray-300 text-gray-800 hover:bg-gray-100 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-300">
-          Sign in
-        </a>
-      </div>
-    </div>
-
-    <!-- Right info card -->
-    <div class="bg-white/85 rounded-2xl shadow-lg shadow-gray-900/5 border border-gray-200/80 p-8 md:p-9 space-y-6 backdrop-blur animate-pop animate-delay-1">
-      <div class="flex items-start justify-between gap-4">
-        <div class="space-y-1.5">
-          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Confidence snapshot</p>
-          <p class="text-2xl font-semibold text-gray-900 leading-snug">
-            Transparent inputs, readable outputs
-          </p>
-        </div>
-        <span class="px-3 py-1.5 rounded-full bg-gray-100 text-xs font-medium text-gray-600">
-          Minimal UI
-        </span>
-      </div>
-
-      <div class="space-y-5 text-sm text-gray-600">
-        <div class="flex items-center space-x-4 group transition-all">
-          <span class="h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 font-semibold text-gray-800 group-hover:bg-black group-hover:text-white transition-all">
-            01
-          </span>
-          <div class="space-y-0.5">
-            <p class="font-semibold text-gray-900">Curated form</p>
-            <p>Only the essentials: type, rooms, size, postcode, area.</p>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4 group transition-all">
-          <span class="h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 font-semibold text-gray-800 group-hover:bg-black group-hover:text-white transition-all">
-            02
-          </span>
-          <div class="space-y-0.5">
-            <p class="font-semibold text-gray-900">Instant response</p>
-            <p>Submit once and view the estimate plus your saved history.</p>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4 group transition-all">
-          <span class="h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 font-semibold text-gray-800 group-hover:bg-black group-hover:text-white transition-all">
-            03
-          </span>
-          <div class="space-y-0.5">
-            <p class="font-semibold text-gray-900">Stay organised</p>
-            <p>History stays on-page with quick clearing when you need it.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- Soft vignette -->
+  <div class="absolute inset-0 bg-[radial-gradient(circle,transparent,rgba(0,0,0,0.06))]"></div>
 </div>
 
-<!-- Why section -->
-<section class="mt-20 md:mt-24 space-y-8 reveal-on-scroll">
-  <div class="flex flex-col md:flex-row items-start justify-between gap-4">
+
+<!-- ============================================================
+     HERO CARD (Hybrid Minimal Premium) with 3D scroll tilt
+=============================================================== -->
+<div class="relative mx-auto mt-12 w-full max-w-[1250px] z-10"
+     style="perspective:1200px; perspective-origin:center 40%;">
+  <div
+    data-hero-card
+    class="hero-tilt
+           rounded-[34px] overflow-hidden
+           bg-white/70 backdrop-blur-2xl
+           shadow-[0_40px_120px_-50px_rgba(15,23,42,0.4)]
+           border border-gray-200/60 animate-fade-up">
+
+    <!-- Floating blobs -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute -top-24 -right-32 w-80 h-80 rounded-full
+                  bg-gradient-to-br from-gray-300/60 via-white to-white blur-3xl"></div>
+      <div class="absolute -bottom-28 -left-32 w-80 h-80 rounded-full
+                  bg-gradient-to-tr from-gray-200/70 via-white to-white blur-3xl"></div>
+    </div>
+
+    <!-- Lens-glass streak -->
+    <div class="absolute inset-0 opacity-[0.12] pointer-events-none
+                bg-[linear-gradient(115deg,rgba(255,255,255,0.3),rgba(255,255,255,0)_35%,rgba(255,255,255,0.25)_60%,rgba(255,255,255,0)_90%)]"></div>
+
+    <!-- Main Hero -->
+    <section class="relative grid md:grid-cols-[1.3fr_0.9fr] gap-20 px-10 py-20">
+
+      <!-- LEFT -->
+      <div class="space-y-10">
+
+        <!-- Tag -->
+        <div class="inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-[0.22em] text-gray-600 animate-fade-up">
+          <span class="h-px w-8 bg-gray-300"></span>
+          <span>Data-led valuation</span>
+        </div>
+
+        <div class="space-y-6 animate-fade-up animate-delay-1">
+          <!-- Animated gradient headline -->
+          <h1 class="text-5xl md:text-6xl font-semibold leading-tight
+                     bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900
+                     bg-clip-text text-transparent 
+                     animate-gradient-x">
+            Property Price ML
+          </h1>
+
+          <p class="text-lg text-gray-600 max-w-xl leading-relaxed">
+            Clean, confidence-building price predictions for every property detail you enter.
+          </p>
+        </div>
+
+        <!-- CTA buttons -->
+        <div class="flex flex-wrap items-center gap-4 animate-fade-up animate-delay-2">
+
+          <!-- Primary -->
+          <a href="/predict"
+             class="px-8 py-3.5 rounded-full text-sm font-medium
+                    bg-black text-white shadow-[0_4px_14px_rgba(0,0,0,0.12)]
+                    hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)]
+                    hover:-translate-y-0.5 active:scale-[0.97]
+                    transition-all duration-300 hover:brightness-110">
+            Start a prediction
+          </a>
+
+          <!-- Secondary -->
+          <a href="/login"
+             class="px-8 py-3.5 rounded-full text-sm font-medium
+                    border border-gray-300 text-gray-800
+                    hover:bg-gray-100 hover:-translate-y-0.5 
+                    hover:shadow-[0_6px_18px_rgba(0,0,0,0.12)]
+                    active:scale-[0.97] transition-all duration-300">
+            Sign in
+          </a>
+
+        </div>
+
+        <!-- Scroll cue -->
+        <div class="mt-8 animate-fade-up animate-delay-3">
+          <div class="flex flex-col items-center space-y-2 opacity-70 hover:opacity-100 transition">
+            <span class="text-xs tracking-[0.2em] text-gray-500">SCROLL</span>
+            <div class="w-[2px] h-6 bg-gray-400 animate-bounce-slow"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT CARD -->
+      <div class="relative bg-white rounded-2xl shadow-lg shadow-gray-900/5
+                  border border-gray-200/80 p-9 space-y-8 
+                  backdrop-blur-lg animate-pop animate-delay-2
+                  overflow-hidden hover:shadow-[0_20px_50px_-12px_rgba(15,23,42,0.2)]
+                  transition-shadow">
+
+        <!-- Glass reflection -->
+        <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-white opacity-[0.4] pointer-events-none"></div>
+
+        <div class="relative space-y-3">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Confidence snapshot</p>
+          <p class="text-2xl font-semibold text-gray-900 leading-snug">Transparent inputs, readable outputs</p>
+        </div>
+
+        <!-- Steps -->
+        <div class="relative space-y-6 text-sm text-gray-600">
+          {% for step, title, desc in [
+            ('01', 'Curated form', 'Only the essentials: type, rooms, size, postcode, area.'),
+            ('02', 'Instant response', 'Submit once and view your estimate plus saved history.'),
+            ('03', 'Stay organised', 'History stays on-page with quick clearing when you need it.')
+          ] %}
+          <div class="flex items-center space-x-4 group transition-all duration-300 hover:translate-x-[2px]">
+
+            <!-- Step bubble -->
+            <span
+              class="flex h-10 w-10 items-center justify-center rounded-full
+                     bg-gray-100 text-[0.75rem] font-semibold text-gray-800
+                     group-hover:bg-black group-hover:text-white
+                     transition-all duration-300 shadow-sm">
+              {{ step }}
+            </span>
+
+            <div class="space-y-0.5">
+              <p class="font-semibold text-gray-900">{{ title }}</p>
+              <p>{{ desc }}</p>
+            </div>
+
+          </div>
+          {% endfor %}
+        </div>
+
+      </div>
+
+    </section>
+  </div>
+</div>
+
+
+
+<!-- ============================================================
+     WHY SECTION (Staggered reveal)
+=============================================================== -->
+<section
+  data-why-section
+  class="mt-28 space-y-14 px-4 max-w-[1250px] mx-auto">
+
+  <!-- Section Header -->
+  <div class="flex flex-col md:flex-row items-start justify-between gap-4 animate-fade-up">
     <div class="space-y-2">
-      <h2 class="text-2xl md:text-3xl font-semibold">Why use Property Price ML?</h2>
-      <p class="text-gray-600 max-w-2xl">
-        A minimal, data-forward flow that keeps you focused on decisions, not decoration.
-      </p>
+      <h2 class="text-3xl font-semibold text-gray-900">Why use Property Price ML?</h2>
+      <p class="text-gray-600 max-w-2xl">A minimal, data-forward flow that keeps your decisions clear.</p>
     </div>
-    <div class="hidden md:block text-sm text-gray-500">
-      Neutral palette, clear hierarchy, subtle motion.
-    </div>
+    <p class="hidden md:block text-sm text-gray-500">Neutral palette • Subtle motion • Modern UI</p>
   </div>
 
-  <div class="grid md:grid-cols-3 gap-7">
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-7 space-y-3 card-elevated">
-      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Model clarity</p>
-      <p class="text-lg font-semibold">Intelligent price predictions</p>
-      <p class="text-sm text-gray-600">
-        Features are surfaced cleanly so the model can translate them into reliable valuations.
-      </p>
+  <!-- Feature Cards -->
+  <div class="grid md:grid-cols-3 gap-8">
+    {% for title, desc, tag, delay in [
+      ('Intelligent price predictions',
+       'Model surfaces meaningful patterns for reliable valuations.',
+       'Model clarity', '0'),
+
+      ('Simple inputs, accurate results',
+       'Focused form for faster entry and clearer results.',
+       'Lean inputs', '0.1s'),
+
+      ('Context-rich insights',
+       'Postcode and area shape richer, contextual predictions.',
+       'Location-aware', '0.2s')
+    ] %}
+    <div
+      class="bg-white rounded-2xl border border-gray-200 shadow-sm p-7 space-y-4
+             hover:shadow-[0_20px_40px_-18px_rgba(15,23,42,0.18)]
+             hover:-translate-y-1 hover:bg-gray-50/40
+             transition-all duration-300 animate-fade-up"
+      style="animation-delay: {{ delay }}">
+
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">{{ tag }}</p>
+      <p class="text-lg font-semibold text-gray-900">{{ title }}</p>
+      <p class="text-sm text-gray-600 leading-relaxed">{{ desc }}</p>
+
     </div>
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-7 space-y-3 card-elevated">
-      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Lean inputs</p>
-      <p class="text-lg font-semibold">Simple inputs, accurate results</p>
-      <p class="text-sm text-gray-600">
-        A focused form means fewer distractions and faster entry with strong defaults.
-      </p>
-    </div>
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-7 space-y-3 card-elevated">
-      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Location-aware</p>
-      <p class="text-lg font-semibold">Context-rich insights</p>
-      <p class="text-sm text-gray-600">
-        Postcode and area sit alongside structure details to shape context-aware predictions.
-      </p>
-    </div>
+    {% endfor %}
   </div>
+
 </section>
+
+
+<!-- ============================================================
+     EXTRA ANIMATIONS + SCROLL 3D LOGIC
+=============================================================== -->
+<style>
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  @keyframes gradient-x {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 8s ease infinite;
+  }
+
+  .hero-tilt {
+    transform-origin: bottom center;
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+    transition: transform 0.16s ease-out, opacity 0.16s ease-out;
+  }
+</style>
+
+<script>
+  (function () {
+    const hero = document.querySelector('[data-hero-card]');
+    const why  = document.querySelector('[data-why-section]');
+
+    if (!hero || !why) return;
+
+    function clamp(v, min, max) {
+      return v < min ? min : v > max ? max : v;
+    }
+
+    function onScroll() {
+      const vw = window.innerHeight || 1;
+      const heroRect = hero.getBoundingClientRect();
+      const whyRect  = why.getBoundingClientRect();
+
+      // Only animate while hero is on screen
+      if (heroRect.bottom <= 0 || heroRect.top >= vw * 1.2) {
+        hero.style.transform = 'rotateX(0deg) translate3d(0,0,0)';
+        hero.style.opacity = '1';
+        return;
+      }
+
+      // Use distance between hero center and midpoint between sections
+      const heroCenter = heroRect.top + heroRect.height / 2;
+
+      // When the WHY section starts entering, we increase progress
+      const midTarget = vw * 0.4;   // point where tilt is noticeable
+      const range     = vw * 0.5;   // how far we scroll before max tilt
+
+      const progress = clamp((midTarget - heroCenter) / range, 0, 1);
+
+      const maxTilt = 18;          // degrees
+      const maxLift = 48;          // px
+
+      const tilt = maxTilt * progress;
+      const lift = maxLift * progress;
+      const opacity = 1 - progress * 0.85;
+
+      hero.style.transform =
+        `rotateX(${tilt}deg) translate3d(0, -${lift}px, 0)`;
+      hero.style.opacity = opacity.toString();
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    document.addEventListener('DOMContentLoaded', onScroll);
+  })();
+</script>
 
 {% endblock %}
