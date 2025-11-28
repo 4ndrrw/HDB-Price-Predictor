@@ -15,7 +15,7 @@ model = load("app/ml/model.pkl")
 # -----------------------------
 @main_bp.route("/")
 def index():
-    return render_template("home.html")   # updated from index.html
+  return render_template("home.html")   # updated from index.html
 
 
 # -----------------------------
@@ -24,22 +24,22 @@ def index():
 @main_bp.route("/predict", methods=["GET", "POST"])
 def predict():
 
-    result = None  # prediction output
+  result = None  # prediction output
 
-    # If POST → run model, save prediction
-    if request.method == "POST":
-        form = request.form.to_dict()
-        X = prepare_input(form)
-        result = model.predict(X)[0]
+  # If POST → run model, save prediction
+  if request.method == "POST":
+    form = request.form.to_dict()
+    X = prepare_input(form)
+    result = model.predict(X)[0]
 
-        # Save into database
-        PredictionHistory.save(form, result)
+    # Save into database
+    PredictionHistory.save(form, result)
 
-    # Always load history for table
-    records = PredictionHistory.get_all()
+  # Always load history for table
+  records = PredictionHistory.get_all()
 
-    # Render the combined predict + history page
-    return render_template("predict.html", result=result, records=records)
+  # Render the combined predict + history page
+  return render_template("predict.html", result=result, records=records)
 
 
 # -----------------------------
@@ -47,4 +47,4 @@ def predict():
 # -----------------------------
 @main_bp.route("/test")
 def test_page():
-    return open("app/test.html").read()
+  return open("app/test.html").read()
