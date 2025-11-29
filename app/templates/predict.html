@@ -322,6 +322,85 @@
   {% endif %}
 </section>
 
+<!-- ============================================================
+     AREA SELECT SCRIPT (Alpine)
+=============================================================== -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+<script>
+function areaSelect() {
+  return {
+    open: false,
+    search: "",
+    selectedValue: "",
+
+    subregions: [
+      "Eastern",
+      "South Western",
+      "Western Central",
+      "South Eastern",
+      "North Western",
+      "Western and Paddington",
+      "Northern",
+      "Eastern Central"
+    ],
+
+    boroughs: [
+      "Enfield",
+      "Twickenham",
+      "Harrow",
+      "Kingston upon Thames",
+      "Croydon",
+      "Bromley",
+      "Ilford",
+      "Sutton",
+      "Kingston"
+    ],
+
+    filteredSubregions: [],
+    filteredBoroughs: [],
+
+    init() {
+      // start with no suggestions shown
+      this.filteredSubregions = [];
+      this.filteredBoroughs = [];
+    },
+
+    filterOptions() {
+      const q = this.search.trim().toLowerCase();
+
+      // Require at least 2 characters
+      if (q.length < 2) {
+        this.filteredSubregions = [];
+        this.filteredBoroughs = [];
+        this.open = false;
+        this.selectedValue = "";
+        return;
+      }
+
+      this.filteredSubregions = this.subregions.filter(a =>
+        a.toLowerCase().includes(q)
+      );
+      this.filteredBoroughs = this.boroughs.filter(a =>
+        a.toLowerCase().includes(q)
+      );
+
+      // Auto-select if there's an exact match (user types full name)
+      const allAreas = [...this.subregions, ...this.boroughs];
+      const exact = allAreas.find(a => a.toLowerCase() === q);
+      this.selectedValue = exact || "";
+
+      this.open = (this.filteredSubregions.length || this.filteredBoroughs.length);
+    },
+
+    select(value) {
+      this.search = value;
+      this.selectedValue = value;
+      this.open = false;
+    }
+  }
+}
+</script>
 
 <!-- ============================================================
      PAGINATION + SORT SCRIPT + CSV EXPORT
@@ -435,6 +514,13 @@ document.addEventListener("DOMContentLoaded", () => {
   renderTable();
 
 });
+
+// If temp_result param exists, remove it from the URL AFTER the page renders
+const url = new URL(window.location);
+if (url.searchParams.get("temp_result")) {
+  url.searchParams.delete("temp_result");
+  window.history.replaceState({}, "", url.pathname);
+}
 </script>
 
 {% endblock %}
