@@ -249,54 +249,51 @@
   </div>
 
   {% if records and records|length > 0 %}
-    <div class="overflow-hidden rounded-2xl border border-gray-200 shadow-[0_10px_28px_-12px_rgba(15,23,42,0.25)] bg-white/70 backdrop-blur">
+  <div class="overflow-hidden rounded-2xl border border-gray-200 shadow-[0_10px_28px_-12px_rgba(15,23,42,0.25)] bg-white/70 backdrop-blur">
 
-    <table class="min-w-full text-sm table-auto">
+    <!-- Table -->
+    <table id="historyTable" class="min-w-full text-sm table-auto">
       <thead>
         <tr class="bg-gray-100/80 text-gray-700">
 
-          <th class="px-5 py-3 font-semibold text-left">ID</th>
+          <!-- SORTABLE ID COLUMN -->
+          <th id="sortIdBtn"
+              class="px-5 py-3 font-semibold text-left cursor-pointer select-none">
+            ID ▲▼
+          </th>
+
           <th class="px-5 py-3 font-semibold text-left">Property Type</th>
           <th class="px-5 py-3 font-semibold text-right">Bedrooms</th>
           <th class="px-5 py-3 font-semibold text-right">Bathrooms</th>
           <th class="px-5 py-3 font-semibold text-right">Size</th>
-          <th class="px-5 py-3 font-semibold text-left">Postcode</th>
+          <th class="px-5 py-3 font-semibold text-right">Postcode</th>
           <th class="px-5 py-3 font-semibold text-right">Predicted Price</th>
 
         </tr>
       </thead>
 
-      <tbody class="divide-y divide-gray-200/70">
-        {% for row in records %}
-        <tr class="transition-all duration-200 hover:bg-gray-100/60 hover:-translate-y-[1px]">
-
-          <td class="px-5 py-3">{{ row.id }}</td>
-
-          <td class="px-5 py-3">{{ row.property_type }}</td>
-
-          <td class="px-5 py-3 text-right">{{ row.bedrooms }}</td>
-
-          <td class="px-5 py-3 text-right">{{ row.bathrooms }}</td>
-
-          <td class="px-5 py-3 text-right">{{ row.size }}</td>
-
-          <td class="px-5 py-3">{{ row.postcode }}</td>
-
-          <td class="px-5 py-3 text-right font-semibold font-mono">
-            {% if row.predicted_price is not none %}
-              £{{ "{:,.2f}".format(row.predicted_price).replace(',', ' ') }}
-            {% else %}
-              N/A
-            {% endif %}
-          </td>
-
-        </tr>
-        {% endfor %}
-      </tbody>
-
+      <tbody id="historyBody" class="divide-y divide-gray-200/70"></tbody>
     </table>
   </div>
 
+  <!-- macOS-style pagination controls -->
+  <div class="flex justify-center items-center gap-6 mt-6 text-sm">
+
+    <button id="prevPage"
+      class="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100
+             transition disabled:opacity-40 disabled:cursor-not-allowed">
+      ◀ Previous
+    </button>
+
+    <div id="pageLabel" class="text-gray-700 font-medium"></div>
+
+    <button id="nextPage"
+      class="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100
+             transition disabled:opacity-40 disabled:cursor-not-allowed">
+      Next ▶
+    </button>
+
+  </div>
 
   {% else %}
   <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-7 text-sm text-gray-600">
@@ -306,6 +303,97 @@
 </section>
 
 
+<!-- ============================================================
+     PAGINATION + SORT SCRIPT
+=============================================================== -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Raw rows from Flask → convert to JS usable array
+  const rows = [
+    {% for r in records %}
+      {
+        id: {{ r.id }},
+        property_type: "{{ r.property_type }}",
+        bedrooms: "{{ r.bedrooms }}",
+        bathrooms: "{{ r.bathrooms }}",
+        size: "{{ r.size }}",
+        postcode: "{{ r.postcode }}",
+        price: `{% if r.predicted_price is not none %}£{{ "{:,.2f}".format(r.predicted_price).replace(',', ' ') }}{% else %}N/A{% endif %}`
+      },
+    {% endfor %}
+  ];
+
+  const tableBody = document.getElementById("historyBody");
+  const prevBtn = document.getElementById("prevPage");
+  const nextBtn = document.getElementById("nextPage");
+  const pageLabel = document.getElementById("pageLabel");
+  const sortBtn = document.getElementById("sortIdBtn");
+
+  let currentPage = 1;
+  const rowsPerPage = 10;
+  let ascending = true; // default: oldest first
+
+  function renderTable() {
+    const start = (currentPage - 1) * rowsPerPage;
+    const pageItems = rows.slice(start, start + rowsPerPage);
+
+    tableBody.innerHTML = "";
+
+    pageItems.forEach(row => {
+      const tr = document.createElement("tr");
+      tr.className = "transition-all duration-200 hover:bg-gray-100/60";
+      tr.innerHTML = `
+        <td class="px-5 py-3">${row.id}</td>
+        <td class="px-5 py-3">${row.property_type}</td>
+        <td class="px-5 py-3 text-right">${row.bedrooms}</td>
+        <td class="px-5 py-3 text-right">${row.bathrooms}</td>
+        <td class="px-5 py-3 text-right">${row.size}</td>
+        <td class="px-5 py-3 text-right">${row.postcode}</td>
+        <td class="px-5 py-3 text-right font-semibold font-mono">${row.price}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+
+    updatePagination();
+  }
+
+  function updatePagination() {
+    const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+    pageLabel.textContent = `Page ${currentPage} of ${totalPages}`;
+
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages;
+  }
+
+  // Pagination buttons
+  prevBtn.onclick = () => {
+    currentPage--;
+    renderTable();
+  };
+
+  nextBtn.onclick = () => {
+    currentPage++;
+    renderTable();
+  };
+
+  // Sorting logic
+  sortBtn.onclick = () => {
+    ascending = !ascending;
+    rows.sort((a, b) => ascending ? a.id - b.id : b.id - a.id);
+    currentPage = 1;
+
+    sortBtn.textContent = ascending ? "ID ▲▼" : "ID ▼▲";
+
+    renderTable();
+  };
+
+  // Initial render
+  renderTable();
+
+});
+</script>
 
 <!-- ============================================================
      AREA SELECT SCRIPT (Alpine)
