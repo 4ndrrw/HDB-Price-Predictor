@@ -227,7 +227,6 @@
 </section>
 
 
-
 <!-- ============================================================
      HISTORY SECTION
 =============================================================== -->
@@ -240,11 +239,24 @@
     </div>
 
     {% if records and records|length > 0 %}
-    <a href="/clear_history"
-       class="px-4 py-2.5 rounded-md border border-gray-300 text-sm font-medium text-gray-800
-              hover:bg-gray-100 hover:-translate-y-0.5 active:scale-[0.97] transition">
-      Clear history
-    </a>
+    <div class="flex items-center gap-3">
+
+      <!-- CSV EXPORT BUTTON -->
+      <button id="downloadCsv"
+        class="px-4 py-2.5 rounded-md border border-gray-300 text-sm font-medium text-gray-800
+               hover:bg-gray-100 hover:-translate-y-0.5 active:scale-[0.97] transition">
+        Download CSV
+      </button>
+
+      <!-- CLEAR HISTORY BUTTON -->
+      <a href="/clear_history"
+        class="px-4 py-2.5 rounded-md text-sm font-medium
+                bg-black text-white border border-transparent
+                hover:bg-gray-900 hover:-translate-y-0.5
+                active:scale-[0.97] transition">
+        Clear history
+      </a>
+    </div>
     {% endif %}
   </div>
 
@@ -256,10 +268,18 @@
       <thead>
         <tr class="bg-gray-100/80 text-gray-700">
 
-          <!-- SORTABLE ID COLUMN -->
+          <!-- SORTABLE ID COLUMN (ICON VERSION) -->
           <th id="sortIdBtn"
               class="px-5 py-3 font-semibold text-left cursor-pointer select-none">
-            ID ▲▼
+            <span class="flex items-center gap-1">
+              ID
+              <svg id="sortIcon" xmlns="http://www.w3.org/2000/svg"
+                   class="h-3 w-3 text-gray-500 transition-transform duration-200"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M5 15l7-7 7 7" />
+              </svg>
+            </span>
           </th>
 
           <th class="px-5 py-3 font-semibold text-left">Property Type</th>
@@ -276,7 +296,7 @@
     </table>
   </div>
 
-  <!-- macOS-style pagination controls -->
+  <!-- Pagination -->
   <div class="flex justify-center items-center gap-6 mt-6 text-sm">
 
     <button id="prevPage"
@@ -304,7 +324,7 @@
 
 
 <!-- ============================================================
-     PAGINATION + SORT SCRIPT
+     PAGINATION + SORT SCRIPT + CSV EXPORT
 =============================================================== -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -319,7 +339,8 @@ document.addEventListener("DOMContentLoaded", () => {
         bathrooms: "{{ r.bathrooms }}",
         size: "{{ r.size }}",
         postcode: "{{ r.postcode }}",
-        price: `{% if r.predicted_price is not none %}£{{ "{:,.2f}".format(r.predicted_price).replace(',', ' ') }}{% else %}N/A{% endif %}`
+        price_raw: {% if r.predicted_price is not none %}{{ r.predicted_price }}{% else %}null{% endif %},
+        price_display: `{% if r.predicted_price is not none %}£{{ "{:,.2f}".format(r.predicted_price).replace(',', ' ') }}{% else %}N/A{% endif %}`
       },
     {% endfor %}
   ];
@@ -329,10 +350,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("nextPage");
   const pageLabel = document.getElementById("pageLabel");
   const sortBtn = document.getElementById("sortIdBtn");
+  const sortIcon = document.getElementById("sortIcon");
+  const downloadBtn = document.getElementById("downloadCsv");
 
   let currentPage = 1;
   const rowsPerPage = 10;
-  let ascending = true; // default: oldest first
+  let ascending = true;
+
+  // DEFAULT SORT: ASCENDING
+  rows.sort((a, b) => a.id - b.id);
+  sortIcon.style.transform = "rotate(0deg)";
 
   function renderTable() {
     const start = (currentPage - 1) * rowsPerPage;
@@ -350,7 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <td class="px-5 py-3 text-right">${row.bathrooms}</td>
         <td class="px-5 py-3 text-right">${row.size}</td>
         <td class="px-5 py-3 text-right">${row.postcode}</td>
-        <td class="px-5 py-3 text-right font-semibold font-mono">${row.price}</td>
+        <td class="px-5 py-3 text-right font-semibold font-mono">${row.price_display}</td>
       `;
       tableBody.appendChild(tr);
     });
@@ -360,119 +387,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updatePagination() {
     const totalPages = Math.ceil(rows.length / rowsPerPage);
-
     pageLabel.textContent = `Page ${currentPage} of ${totalPages}`;
-
     prevBtn.disabled = currentPage === 1;
     nextBtn.disabled = currentPage === totalPages;
   }
 
-  // Pagination buttons
-  prevBtn.onclick = () => {
-    currentPage--;
-    renderTable();
-  };
+  prevBtn.onclick = () => { currentPage--; renderTable(); };
+  nextBtn.onclick = () => { currentPage++; renderTable(); };
 
-  nextBtn.onclick = () => {
-    currentPage++;
-    renderTable();
-  };
-
-  // Sorting logic
+  // NEW CLEAN SORTING LOGIC (ARROW ICON VERSION)
   sortBtn.onclick = () => {
     ascending = !ascending;
+
     rows.sort((a, b) => ascending ? a.id - b.id : b.id - a.id);
     currentPage = 1;
 
-    sortBtn.textContent = ascending ? "ID ▲▼" : "ID ▼▲";
+    sortIcon.style.transform = ascending ? "rotate(0deg)" : "rotate(180deg)";
+    sortIcon.style.transition = "transform 0.25s ease";
 
     renderTable();
+  };
+
+
+  //----------------------------------------------------
+  // CSV DOWNLOAD
+  //----------------------------------------------------
+  downloadBtn.onclick = () => {
+    let csv = "ID,Property Type,Bedrooms,Bathrooms,Size,Postcode,Predicted Price\n";
+
+    rows.forEach(r => {
+      const price = r.price_raw !== null ? r.price_raw.toFixed(2) : "";
+      csv += `${r.id},${r.property_type},${r.bedrooms},${r.bathrooms},${r.size},${r.postcode},${price}\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "predictions.csv";
+    a.click();
+
+    URL.revokeObjectURL(url);
   };
 
   // Initial render
   renderTable();
 
 });
-</script>
-
-<!-- ============================================================
-     AREA SELECT SCRIPT (Alpine)
-=============================================================== -->
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-
-<script>
-function areaSelect() {
-  return {
-    open: false,
-    search: "",
-    selectedValue: "",
-
-    subregions: [
-      "Eastern",
-      "South Western",
-      "Western Central",
-      "South Eastern",
-      "North Western",
-      "Western and Paddington",
-      "Northern",
-      "Eastern Central"
-    ],
-
-    boroughs: [
-      "Enfield",
-      "Twickenham",
-      "Harrow",
-      "Kingston upon Thames",
-      "Croydon",
-      "Bromley",
-      "Ilford",
-      "Sutton",
-      "Kingston"
-    ],
-
-    filteredSubregions: [],
-    filteredBoroughs: [],
-
-    init() {
-      // start with no suggestions shown
-      this.filteredSubregions = [];
-      this.filteredBoroughs = [];
-    },
-
-    filterOptions() {
-      const q = this.search.trim().toLowerCase();
-
-      // Require at least 2 characters
-      if (q.length < 2) {
-        this.filteredSubregions = [];
-        this.filteredBoroughs = [];
-        this.open = false;
-        this.selectedValue = "";
-        return;
-      }
-
-      this.filteredSubregions = this.subregions.filter(a =>
-        a.toLowerCase().includes(q)
-      );
-      this.filteredBoroughs = this.boroughs.filter(a =>
-        a.toLowerCase().includes(q)
-      );
-
-      // Auto-select if there's an exact match (user types full name)
-      const allAreas = [...this.subregions, ...this.boroughs];
-      const exact = allAreas.find(a => a.toLowerCase() === q);
-      this.selectedValue = exact || "";
-
-      this.open = (this.filteredSubregions.length || this.filteredBoroughs.length);
-    },
-
-    select(value) {
-      this.search = value;
-      this.selectedValue = value;
-      this.open = false;
-    }
-  }
-}
 </script>
 
 {% endblock %}
