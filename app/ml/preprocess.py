@@ -1,8 +1,6 @@
 import pandas as pd
+from .area_lookup import AREA_AVG_PRICE
 
-# --------------------------------------------------------------------
-# Columns your trained pipeline expects BEFORE any transformations
-# --------------------------------------------------------------------
 INPUT_COLUMNS = [
   "Bedrooms",
   "Bathrooms",
@@ -14,29 +12,23 @@ INPUT_COLUMNS = [
 ]
 
 def prepare_input(raw: dict) -> pd.DataFrame:
-  """
-  Prepares raw form input values for the ML pipeline.
-  The returned DataFrame contains ONLY the 7 raw columns expected by
-  the fitted Pipeline (TargetEncoder + ColumnTransformer + Model).
 
-  No manual target encoding, scaling, or one-hot encoding is done here.
-  The loaded model pipeline handles all transformations.
-  """
+  # numeric
+  bedrooms = float(raw["Bedrooms"])
+  bathrooms = float(raw["Bathrooms"])
+  size = float(raw["Size"])
 
-  # Clean + convert fields
-  try:
-    bedrooms = float(raw["Bedrooms"])
-    bathrooms = float(raw["Bathrooms"])
-    size = float(raw["Size"])
-    area_avg_price = float(raw["Area_Avg_Price"])
-  except ValueError:
-    raise ValueError("Numeric fields must be valid numbers.")
+  # categorical (use raw keys EXACTLY as they appear in HTML)
+  property_type = raw["Property Type"].strip()
+  area = raw["Area"].strip()
+  postcode = raw["Postcode"].strip().upper()
 
-  property_type = str(raw["Property Type"]).strip()
-  area = str(raw["Area"]).strip()
-  postcode = str(raw["Postcode"]).strip().upper()
+  # Auto-fill average price
+  area_avg_price = AREA_AVG_PRICE.get(area)
 
-  # Construct a DataFrame in the EXACT required order
+  if area_avg_price is None:
+    raise ValueError(f"Unknown area '{area}'. Cannot compute Area_Avg_Price.")
+
   df = pd.DataFrame([{
     "Bedrooms": bedrooms,
     "Bathrooms": bathrooms,
@@ -47,5 +39,4 @@ def prepare_input(raw: dict) -> pd.DataFrame:
     "Postcode": postcode
   }])
 
-  # Enforce strict column order to match training expectations
   return df[INPUT_COLUMNS]

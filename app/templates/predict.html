@@ -2,26 +2,21 @@
 {% block content %}
 
 <!-- ============================================================
-     GLOBAL BACKGROUND (Same as home page)
+     GLOBAL BACKGROUND (Same as Home Page)
 =============================================================== -->
 <div class="fixed inset-0 -z-20 w-full h-full pointer-events-none overflow-hidden">
-  <!-- Soft neutral radial gradient -->
   <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,
                     rgba(255,255,255,0.95) 0%,
                     rgba(248,248,248,0.88) 40%,
                     rgba(242,242,242,0.94) 70%,
-                    rgba(238,238,238,1) 100%)]">
-  </div>
+                    rgba(238,238,238,1) 100%)]"></div>
 
-  <!-- Subtle mesh -->
   <div class="absolute inset-0 opacity-[0.045]
               bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]
               mix-blend-soft-light"></div>
 
-  <!-- Soft vignette -->
   <div class="absolute inset-0 bg-[radial-gradient(circle,transparent,rgba(0,0,0,0.06))]"></div>
 </div>
-
 
 
 <!-- ============================================================
@@ -29,7 +24,8 @@
 =============================================================== -->
 <section class="relative max-w-[1250px] mx-auto mt-14 px-4">
 
-  <div class="relative rounded-[32px] overflow-hidden bg-white/70 backdrop-blur-xl
+  <!-- NOTE: overflow-hidden REMOVED to prevent dropdown clipping -->
+  <div class="relative rounded-[32px] bg-white/70 backdrop-blur-xl
               border border-gray-200/60 shadow-[0_40px_120px_-50px_rgba(15,23,42,0.4)]
               animate-fade-up">
 
@@ -41,14 +37,17 @@
                   bg-gradient-to-tr from-gray-200/70 via-white to-white blur-3xl"></div>
     </div>
 
-    <!-- Lens-glass streak -->
+    <!-- Lens streak -->
     <div class="absolute inset-0 opacity-[0.12] pointer-events-none
                 bg-[linear-gradient(115deg,rgba(255,255,255,0.3),rgba(255,255,255,0)_35%,rgba(255,255,255,0.25)_60%,rgba(255,255,255,0)_90%)]"></div>
 
-    <!-- Main content -->
+
+    <!-- ========================================================
+         MAIN CONTENT GRID
+    ========================================================= -->
     <div class="relative grid md:grid-cols-2 gap-14 px-10 py-16">
 
-      <!-- ================= LEFT: FORM ================= -->
+      <!-- ================= LEFT — FORM ================= -->
       <div class="space-y-10">
 
         <!-- Header -->
@@ -60,55 +59,115 @@
           </p>
         </div>
 
-        <!-- Form -->
+
+        <!-- =====================================================
+             FORM
+        ====================================================== -->
         <form method="POST" class="space-y-7">
           <div class="grid md:grid-cols-2 gap-6">
 
+            <!-- Property Type -->
             <div class="space-y-2">
               <label class="text-sm font-medium text-gray-700">Property Type</label>
-              <select name="property_type"
+              <select name="Property Type"
                       class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
                              focus:border-black focus:ring-2 focus:ring-black/10 transition">
                 <option>Apartment</option>
+                <option>Flat</option>
                 <option>House</option>
-                <option>Studio</option>
-                <option>Other</option>
+                <option>Semi-Detached</option>
+                <option>Terraced</option>
               </select>
             </div>
 
+            <!-- Bedrooms -->
             <div class="space-y-2">
               <label class="text-sm font-medium text-gray-700">Bedrooms</label>
-              <input name="bedrooms" type="number" min="0"
+              <input name="Bedrooms" type="number" min="0"
                      class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
                             focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
             </div>
 
+            <!-- Bathrooms -->
             <div class="space-y-2">
               <label class="text-sm font-medium text-gray-700">Bathrooms</label>
-              <input name="bathrooms" type="number" min="0"
+              <input name="Bathrooms" type="number" min="0"
                      class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
                             focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
             </div>
 
+            <!-- Size -->
             <div class="space-y-2">
               <label class="text-sm font-medium text-gray-700">Size (sqft)</label>
-              <input name="size" type="number" min="0"
+              <input name="Size" type="number" min="0"
                      class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
                             focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
             </div>
 
+            <!-- Postcode -->
             <div class="space-y-2">
               <label class="text-sm font-medium text-gray-700">Postcode</label>
-              <input name="postcode"
+              <input name="Postcode"
                      class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
                             focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
             </div>
 
-            <div class="space-y-2">
+
+            <!-- =====================================================
+                 AREA — SEARCHABLE GROUPED SELECT (Alpine)
+            ====================================================== -->
+            <div x-data="areaSelect()" @click.outside="open = false" class="space-y-2 relative">
               <label class="text-sm font-medium text-gray-700">Area</label>
-              <input name="area"
-                     class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
-                            focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
+
+              <!-- Visible search bar -->
+              <input 
+                x-model="search"
+                @focus="filterOptions()"
+                @input="filterOptions()"
+                type="text"
+                placeholder="Start typing (min 2 letters)…"
+                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
+                       focus:border-black focus:ring-2 focus:ring-black/10 transition" />
+
+              <!-- Hidden value submitted to backend -->
+              <input type="hidden" name="Area" x-model="selectedValue" />
+
+              <!-- Dropdown -->
+              <div 
+                x-show="open"
+                x-transition
+                class="absolute z-20 mt-1 w-full bg-white border border-gray-200 
+                       rounded-xl shadow-lg max-h-64 overflow-y-auto">
+
+                <!-- Subregions -->
+                <template x-if="filteredSubregions.length">
+                  <div>
+                    <div class="px-3 py-2 text-[10px] uppercase tracking-wide text-gray-500 bg-gray-50 sticky top-0">
+                      Subregions
+                    </div>
+                    <template x-for="item in filteredSubregions" :key="'sub-'+item">
+                      <div @click="select(item)"
+                           class="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
+                           x-text="item"></div>
+                    </template>
+                  </div>
+                </template>
+
+                <!-- Boroughs -->
+                <template x-if="filteredBoroughs.length">
+                  <div>
+                    <div class="px-3 py-2 text-[10px] uppercase tracking-wide text-gray-500 bg-gray-50 sticky top-0 border-t border-gray-200">
+                      Boroughs
+                    </div>
+                    <template x-for="item in filteredBoroughs" :key="'bor-'+item">
+                      <div @click="select(item)"
+                           class="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
+                           x-text="item"></div>
+                    </template>
+                  </div>
+                </template>
+
+              </div>
             </div>
 
           </div>
@@ -134,7 +193,7 @@
       </div>
 
 
-      <!-- ================= RIGHT: PREVIEW / RESULT ================= -->
+      <!-- ========================== RIGHT — RESULT ======================= -->
       <div class="relative bg-white rounded-2xl border border-gray-200 shadow-lg shadow-gray-900/5 
                   backdrop-blur-md p-8 space-y-6 animate-pop">
 
@@ -150,24 +209,21 @@
           {% endif %}
         </div>
 
-        <!-- Dynamic content -->
         {% if result %}
           <div class="rounded-xl border border-gray-200 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-700">Estimated property price</p>
             <p class="text-3xl font-bold text-gray-900 mt-1">
-              A${ "%.2f"|format(result) }
+              £{{ result|gbp }}
             </p>
             <p class="text-xs text-gray-500 mt-1">Generated just now</p>
           </div>
         {% else %}
           <div class="rounded-xl h-20 bg-gray-100 animate-pulse"></div>
         {% endif %}
-
       </div>
 
     </div>
   </div>
-
 </section>
 
 
@@ -193,34 +249,47 @@
   </div>
 
   {% if records and records|length > 0 %}
-  <div class="overflow-hidden border border-gray-200 rounded-xl shadow-sm">
-    <table class="min-w-full text-sm">
-      <thead class="bg-gray-100 text-gray-700">
-        <tr>
-          <th class="px-4 py-3 font-semibold">ID</th>
-          <th class="px-4 py-3 font-semibold">Property Type</th>
-          <th class="px-4 py-3 font-semibold">Bedrooms</th>
-          <th class="px-4 py-3 font-semibold">Bathrooms</th>
-          <th class="px-4 py-3 font-semibold">Size</th>
-          <th class="px-4 py-3 font-semibold">Postcode</th>
-          <th class="px-4 py-3 font-semibold">Predicted Price</th>
+    <div class="overflow-hidden rounded-2xl border border-gray-200 shadow-[0_10px_28px_-12px_rgba(15,23,42,0.25)] bg-white/70 backdrop-blur">
+
+    <table class="min-w-full text-sm table-auto">
+      <thead>
+        <tr class="bg-gray-100/80 text-gray-700">
+
+          <th class="px-5 py-3 font-semibold text-left">ID</th>
+          <th class="px-5 py-3 font-semibold text-left">Property Type</th>
+          <th class="px-5 py-3 font-semibold text-right">Bedrooms</th>
+          <th class="px-5 py-3 font-semibold text-right">Bathrooms</th>
+          <th class="px-5 py-3 font-semibold text-right">Size</th>
+          <th class="px-5 py-3 font-semibold text-left">Postcode</th>
+          <th class="px-5 py-3 font-semibold text-right">Predicted Price</th>
+
         </tr>
       </thead>
 
-      <tbody class="divide-y divide-gray-200">
+      <tbody class="divide-y divide-gray-200/70">
         {% for row in records %}
-        <tr class="odd:bg-white even:bg-gray-50 transition hover:bg-gray-100/60">
-          <td class="px-4 py-3">{{ row.id }}</td>
-          <td class="px-4 py-3">{{ row.property_type }}</td>
-          <td class="px-4 py-3">{{ row.bedrooms }}</td>
-          <td class="px-4 py-3">{{ row.bathrooms }}</td>
-          <td class="px-4 py-3">{{ row.size }}</td>
-          <td class="px-4 py-3">{{ row.postcode }}</td>
-          <td class="px-4 py-3 font-semibold">
+        <tr class="transition-all duration-200 hover:bg-gray-100/60 hover:-translate-y-[1px]">
+
+          <td class="px-5 py-3">{{ row.id }}</td>
+
+          <td class="px-5 py-3">{{ row.property_type }}</td>
+
+          <td class="px-5 py-3 text-right">{{ row.bedrooms }}</td>
+
+          <td class="px-5 py-3 text-right">{{ row.bathrooms }}</td>
+
+          <td class="px-5 py-3 text-right">{{ row.size }}</td>
+
+          <td class="px-5 py-3">{{ row.postcode }}</td>
+
+          <td class="px-5 py-3 text-right font-semibold font-mono">
             {% if row.predicted_price is not none %}
-              A${{ row.predicted_price | round(2) }}
-            {% else %} N/A {% endif %}
+              £{{ "{:,.2f}".format(row.predicted_price).replace(',', ' ') }}
+            {% else %}
+              N/A
+            {% endif %}
           </td>
+
         </tr>
         {% endfor %}
       </tbody>
@@ -228,12 +297,94 @@
     </table>
   </div>
 
+
   {% else %}
   <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-7 text-sm text-gray-600">
     No predictions yet. Use the form above to generate your first estimate.
   </div>
   {% endif %}
-
 </section>
+
+
+
+<!-- ============================================================
+     AREA SELECT SCRIPT (Alpine)
+=============================================================== -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+<script>
+function areaSelect() {
+  return {
+    open: false,
+    search: "",
+    selectedValue: "",
+
+    subregions: [
+      "Eastern",
+      "South Western",
+      "Western Central",
+      "South Eastern",
+      "North Western",
+      "Western and Paddington",
+      "Northern",
+      "Eastern Central"
+    ],
+
+    boroughs: [
+      "Enfield",
+      "Twickenham",
+      "Harrow",
+      "Kingston upon Thames",
+      "Croydon",
+      "Bromley",
+      "Ilford",
+      "Sutton",
+      "Kingston"
+    ],
+
+    filteredSubregions: [],
+    filteredBoroughs: [],
+
+    init() {
+      // start with no suggestions shown
+      this.filteredSubregions = [];
+      this.filteredBoroughs = [];
+    },
+
+    filterOptions() {
+      const q = this.search.trim().toLowerCase();
+
+      // Require at least 2 characters
+      if (q.length < 2) {
+        this.filteredSubregions = [];
+        this.filteredBoroughs = [];
+        this.open = false;
+        this.selectedValue = "";
+        return;
+      }
+
+      this.filteredSubregions = this.subregions.filter(a =>
+        a.toLowerCase().includes(q)
+      );
+      this.filteredBoroughs = this.boroughs.filter(a =>
+        a.toLowerCase().includes(q)
+      );
+
+      // Auto-select if there's an exact match (user types full name)
+      const allAreas = [...this.subregions, ...this.boroughs];
+      const exact = allAreas.find(a => a.toLowerCase() === q);
+      this.selectedValue = exact || "";
+
+      this.open = (this.filteredSubregions.length || this.filteredBoroughs.length);
+    },
+
+    select(value) {
+      this.search = value;
+      this.selectedValue = value;
+      this.open = false;
+    }
+  }
+}
+</script>
 
 {% endblock %}
