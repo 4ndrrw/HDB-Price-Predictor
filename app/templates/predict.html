@@ -228,99 +228,115 @@
 
 
 <!-- ============================================================
-     HISTORY SECTION
+     HISTORY SECTION (ONLY VISIBLE WHEN LOGGED IN)
 =============================================================== -->
 <section class="max-w-[1250px] mx-auto mt-20 px-4 space-y-8 reveal-on-scroll">
 
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-    <div>
-      <p class="text-sm font-semibold text-gray-700">Prediction history</p>
-      <p class="text-sm text-gray-600">Your previously submitted valuations.</p>
+  {% if user_logged_in %}
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+      <div>
+        <p class="text-sm font-semibold text-gray-700">Prediction history</p>
+        <p class="text-sm text-gray-600">Your previously submitted valuations.</p>
+      </div>
+
+      {% if records and records|length > 0 %}
+      <div class="flex items-center gap-3">
+
+        <!-- CSV EXPORT BUTTON -->
+        <button id="downloadCsv"
+          class="px-4 py-2.5 rounded-md border border-gray-300 text-sm font-medium text-gray-800
+                 hover:bg-gray-100 hover:-translate-y-0.5 active:scale-[0.97] transition">
+          Download CSV
+        </button>
+
+        <!-- CLEAR HISTORY BUTTON -->
+        <a href="/clear_history"
+          class="px-4 py-2.5 rounded-md text-sm font-medium
+                  bg-black text-white border border-transparent
+                  hover:bg-gray-900 hover:-translate-y-0.5
+                  active:scale-[0.97] transition">
+          Clear history
+        </a>
+      </div>
+      {% endif %}
     </div>
 
     {% if records and records|length > 0 %}
-    <div class="flex items-center gap-3">
+    <div class="overflow-hidden rounded-2xl border border-gray-200 shadow-[0_10px_28px_-12px_rgba(15,23,42,0.25)] bg-white/70 backdrop-blur">
 
-      <!-- CSV EXPORT BUTTON -->
-      <button id="downloadCsv"
-        class="px-4 py-2.5 rounded-md border border-gray-300 text-sm font-medium text-gray-800
-               hover:bg-gray-100 hover:-translate-y-0.5 active:scale-[0.97] transition">
-        Download CSV
+      <!-- Table -->
+      <table id="historyTable" class="min-w-full text-sm table-auto">
+        <thead>
+          <tr class="bg-gray-100/80 text-gray-700">
+
+            <!-- SORTABLE ID COLUMN (ICON VERSION) -->
+            <th id="sortIdBtn"
+                class="px-5 py-3 font-semibold text-left cursor-pointer select-none">
+              <span class="flex items-center gap-1">
+                ID
+                <svg id="sortIcon" xmlns="http://www.w3.org/2000/svg"
+                     class="h-3 w-3 text-gray-500 transition-transform duration-200"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5 15l7-7 7 7" />
+                </svg>
+              </span>
+            </th>
+
+            <th class="px-5 py-3 font-semibold text-left">Property Type</th>
+            <th class="px-5 py-3 font-semibold text-right">Bedrooms</th>
+            <th class="px-5 py-3 font-semibold text-right">Bathrooms</th>
+            <th class="px-5 py-3 font-semibold text-right">Size</th>
+            <th class="px-5 py-3 font-semibold text-right">Postcode</th>
+            <th class="px-5 py-3 font-semibold text-right">Predicted Price</th>
+
+          </tr>
+        </thead>
+
+        <tbody id="historyBody" class="divide-y divide-gray-200/70"></tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-center items-center gap-6 mt-6 text-sm">
+
+      <button id="prevPage"
+        class="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100
+               transition disabled:opacity-40 disabled:cursor-not-allowed">
+        ◀ Previous
       </button>
 
-      <!-- CLEAR HISTORY BUTTON -->
-      <a href="/clear_history"
-        class="px-4 py-2.5 rounded-md text-sm font-medium
-                bg-black text-white border border-transparent
-                hover:bg-gray-900 hover:-translate-y-0.5
-                active:scale-[0.97] transition">
-        Clear history
-      </a>
+      <div id="pageLabel" class="text-gray-700 font-medium"></div>
+
+      <button id="nextPage"
+        class="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100
+               transition disabled:opacity-40 disabled:cursor-not-allowed">
+        Next ▶
+      </button>
+
+    </div>
+
+    {% else %}
+    <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-7 text-sm text-gray-600">
+      No predictions yet. Use the form above to generate your first estimate.
     </div>
     {% endif %}
-  </div>
-
-  {% if records and records|length > 0 %}
-  <div class="overflow-hidden rounded-2xl border border-gray-200 shadow-[0_10px_28px_-12px_rgba(15,23,42,0.25)] bg-white/70 backdrop-blur">
-
-    <!-- Table -->
-    <table id="historyTable" class="min-w-full text-sm table-auto">
-      <thead>
-        <tr class="bg-gray-100/80 text-gray-700">
-
-          <!-- SORTABLE ID COLUMN (ICON VERSION) -->
-          <th id="sortIdBtn"
-              class="px-5 py-3 font-semibold text-left cursor-pointer select-none">
-            <span class="flex items-center gap-1">
-              ID
-              <svg id="sortIcon" xmlns="http://www.w3.org/2000/svg"
-                   class="h-3 w-3 text-gray-500 transition-transform duration-200"
-                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M5 15l7-7 7 7" />
-              </svg>
-            </span>
-          </th>
-
-          <th class="px-5 py-3 font-semibold text-left">Property Type</th>
-          <th class="px-5 py-3 font-semibold text-right">Bedrooms</th>
-          <th class="px-5 py-3 font-semibold text-right">Bathrooms</th>
-          <th class="px-5 py-3 font-semibold text-right">Size</th>
-          <th class="px-5 py-3 font-semibold text-right">Postcode</th>
-          <th class="px-5 py-3 font-semibold text-right">Predicted Price</th>
-
-        </tr>
-      </thead>
-
-      <tbody id="historyBody" class="divide-y divide-gray-200/70"></tbody>
-    </table>
-  </div>
-
-  <!-- Pagination -->
-  <div class="flex justify-center items-center gap-6 mt-6 text-sm">
-
-    <button id="prevPage"
-      class="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100
-             transition disabled:opacity-40 disabled:cursor-not-allowed">
-      ◀ Previous
-    </button>
-
-    <div id="pageLabel" class="text-gray-700 font-medium"></div>
-
-    <button id="nextPage"
-      class="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100
-             transition disabled:opacity-40 disabled:cursor-not-allowed">
-      Next ▶
-    </button>
-
-  </div>
 
   {% else %}
-  <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-7 text-sm text-gray-600">
-    No predictions yet. Use the form above to generate your first estimate.
-  </div>
+    <!-- LOGGED OUT VIEW -->
+    <div class="rounded-xl border border-gray-200 bg-white/60 backdrop-blur p-10 text-center space-y-4">
+      <p class="text-gray-600 text-sm">Log in to view your prediction history.</p>
+      <a href="/login"
+         class="inline-block px-6 py-2.5 rounded-md bg-black text-white text-sm font-medium
+                hover:bg-gray-900 transition active:scale-[0.97]">
+        Sign in
+      </a>
+    </div>
   {% endif %}
+
 </section>
+
 
 <!-- ============================================================
      AREA SELECT SCRIPT (Alpine)
@@ -402,13 +418,13 @@ function areaSelect() {
 }
 </script>
 
+{% if user_logged_in %}
 <!-- ============================================================
-     PAGINATION + SORT SCRIPT + CSV EXPORT
+     PAGINATION + SORT SCRIPT + CSV EXPORT (ONLY WHEN LOGGED IN)
 =============================================================== -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Raw rows from Flask → convert to JS usable array
   const rows = [
     {% for r in records %}
       {
@@ -436,7 +452,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const rowsPerPage = 10;
   let ascending = true;
 
-  // DEFAULT SORT: ASCENDING
   rows.sort((a, b) => a.id - b.id);
   sortIcon.style.transform = "rotate(0deg)";
 
@@ -474,23 +489,16 @@ document.addEventListener("DOMContentLoaded", () => {
   prevBtn.onclick = () => { currentPage--; renderTable(); };
   nextBtn.onclick = () => { currentPage++; renderTable(); };
 
-  // NEW CLEAN SORTING LOGIC (ARROW ICON VERSION)
   sortBtn.onclick = () => {
     ascending = !ascending;
-
     rows.sort((a, b) => ascending ? a.id - b.id : b.id - a.id);
     currentPage = 1;
-
     sortIcon.style.transform = ascending ? "rotate(0deg)" : "rotate(180deg)";
     sortIcon.style.transition = "transform 0.25s ease";
-
     renderTable();
   };
 
-
-  //----------------------------------------------------
-  // CSV DOWNLOAD
-  //----------------------------------------------------
+  // CSV Export
   downloadBtn.onclick = () => {
     let csv = "ID,Property Type,Bedrooms,Bathrooms,Size,Postcode,Predicted Price\n";
 
@@ -510,17 +518,10 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   };
 
-  // Initial render
   renderTable();
 
 });
-
-// If temp_result param exists, remove it from the URL AFTER the page renders
-const url = new URL(window.location);
-if (url.searchParams.get("temp_result")) {
-  url.searchParams.delete("temp_result");
-  window.history.replaceState({}, "", url.pathname);
-}
 </script>
+{% endif %}
 
 {% endblock %}

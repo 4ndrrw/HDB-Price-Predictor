@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS predictions (
   area TEXT,
   postcode TEXT,
   predicted_price REAL,
-  timestamp TEXT
+  timestamp TEXT,
+  user_id INTEGER
 );
 """)
 
