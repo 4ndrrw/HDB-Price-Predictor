@@ -425,10 +425,14 @@ function areaSelect() {
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  const rows = [
+  // -------------------------------
+  // 1. Load rows from backend
+  // -------------------------------
+  let rows = [
     {% for r in records %}
       {
-        id: {{ r.id }},
+        real_id: {{ r.id }},    // <-- real DB id
+        display_id: null,       // <-- per-user index (1,2,3...)
         property_type: "{{ r.property_type }}",
         bedrooms: "{{ r.bedrooms }}",
         bathrooms: "{{ r.bathrooms }}",
@@ -440,21 +444,41 @@ document.addEventListener("DOMContentLoaded", () => {
     {% endfor %}
   ];
 
-  const tableBody = document.getElementById("historyBody");
-  const prevBtn = document.getElementById("prevPage");
-  const nextBtn = document.getElementById("nextPage");
-  const pageLabel = document.getElementById("pageLabel");
-  const sortBtn = document.getElementById("sortIdBtn");
-  const sortIcon = document.getElementById("sortIcon");
+  // -------------------------------
+  // 2. Sort by real DB id ASC
+  // -------------------------------
+  rows.sort((a, b) => a.real_id - b.real_id);
+
+  // -------------------------------
+  // 3. Assign per-user IDs (1..N)
+  // -------------------------------
+  rows = rows.map((row, i) => ({
+    ...row,
+    display_id: i + 1
+  }));
+
+  // -------------------------------
+  // DOM elements
+  // -------------------------------
+  const tableBody   = document.getElementById("historyBody");
+  const prevBtn     = document.getElementById("prevPage");
+  const nextBtn     = document.getElementById("nextPage");
+  const pageLabel   = document.getElementById("pageLabel");
+  const sortBtn     = document.getElementById("sortIdBtn");
+  const sortIcon    = document.getElementById("sortIcon");
   const downloadBtn = document.getElementById("downloadCsv");
 
   let currentPage = 1;
   const rowsPerPage = 10;
   let ascending = true;
 
-  rows.sort((a, b) => a.id - b.id);
+  // default sort by display_id
+  rows.sort((a, b) => a.display_id - b.display_id);
   sortIcon.style.transform = "rotate(0deg)";
 
+  // -------------------------------
+  // Render table
+  // -------------------------------
   function renderTable() {
     const start = (currentPage - 1) * rowsPerPage;
     const pageItems = rows.slice(start, start + rowsPerPage);
@@ -464,8 +488,9 @@ document.addEventListener("DOMContentLoaded", () => {
     pageItems.forEach(row => {
       const tr = document.createElement("tr");
       tr.className = "transition-all duration-200 hover:bg-gray-100/60";
+
       tr.innerHTML = `
-        <td class="px-5 py-3">${row.id}</td>
+        <td class="px-5 py-3">${row.display_id}</td>
         <td class="px-5 py-3">${row.property_type}</td>
         <td class="px-5 py-3 text-right">${row.bedrooms}</td>
         <td class="px-5 py-3 text-right">${row.bathrooms}</td>
@@ -479,6 +504,9 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePagination();
   }
 
+  // -------------------------------
+  // Pagination controls
+  // -------------------------------
   function updatePagination() {
     const totalPages = Math.ceil(rows.length / rowsPerPage);
     pageLabel.textContent = `Page ${currentPage} of ${totalPages}`;
@@ -489,22 +517,33 @@ document.addEventListener("DOMContentLoaded", () => {
   prevBtn.onclick = () => { currentPage--; renderTable(); };
   nextBtn.onclick = () => { currentPage++; renderTable(); };
 
+  // -------------------------------
+  // Sorting (by display_id)
+  // -------------------------------
   sortBtn.onclick = () => {
     ascending = !ascending;
-    rows.sort((a, b) => ascending ? a.id - b.id : b.id - a.id);
+
+    rows.sort((a, b) =>
+      ascending ? a.display_id - b.display_id : b.display_id - a.display_id
+    );
+
     currentPage = 1;
     sortIcon.style.transform = ascending ? "rotate(0deg)" : "rotate(180deg)";
     sortIcon.style.transition = "transform 0.25s ease";
+
     renderTable();
   };
 
-  // CSV Export
+  // -------------------------------
+  // CSV Download (exports REAL DB id)
+  // -------------------------------
   downloadBtn.onclick = () => {
-    let csv = "ID,Property Type,Bedrooms,Bathrooms,Size,Postcode,Predicted Price\n";
+
+    let csv = "Real ID,Display ID,Property Type,Bedrooms,Bathrooms,Size,Postcode,Predicted Price\n";
 
     rows.forEach(r => {
       const price = r.price_raw !== null ? r.price_raw.toFixed(2) : "";
-      csv += `${r.id},${r.property_type},${r.bedrooms},${r.bathrooms},${r.size},${r.postcode},${price}\n`;
+      csv += `${r.real_id},${r.display_id},${r.property_type},${r.bedrooms},${r.bathrooms},${r.size},${r.postcode},${price}\n`;
     });
 
     const blob = new Blob([csv], { type: "text/csv" });
@@ -518,10 +557,10 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   };
 
+  // Initial render
   renderTable();
 
 });
 </script>
 {% endif %}
-
 {% endblock %}
