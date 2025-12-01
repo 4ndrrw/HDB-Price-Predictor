@@ -4,7 +4,7 @@
 <!-- ============================================================
      ARCHITECTURAL SHAPES + BALANCED LAYOUT + CIRCLE GRID (Tweaked)
 =============================================================== -->
-<div class="absolute inset-0 pointer-events-none select-none"
+<div class="fixed inset-0 pointer-events-none select-none -z-20"
      id="shape-parallax">
 
 
@@ -117,17 +117,6 @@
   .animate-drift-slow { animation: drift-slow 22s ease-in-out infinite; }
   .animate-drift-alt  { animation: drift-alt  27s ease-in-out infinite; }
 </style>
-
-<script>
-  (function () {
-    const shapes = document.getElementById("shape-parallax");
-    if (!shapes) return;
-    window.addEventListener("scroll", () => {
-      const scrollY = window.scrollY * 0.10;
-      shapes.style.transform = `translateY(${scrollY}px)`;
-    }, { passive: true });
-  })();
-</script>
 
 
 <!-- ============================================================
