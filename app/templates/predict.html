@@ -20,11 +20,10 @@
 
 
 <!-- ============================================================
-     UNIFIED HERO CARD
+     UNIFIED HERO CARD (UPDATED FONTS + SPACING)
 =============================================================== -->
-<section class="relative max-w-[1250px] mx-auto mt-14 px-4">
+<section class="relative max-w-[90rem] mx-auto mt-24 px-6">
 
-  <!-- NOTE: overflow-hidden REMOVED to prevent dropdown clipping -->
   <div class="relative rounded-[32px] bg-white/70 backdrop-blur-xl
               border border-gray-200/60 shadow-[0_40px_120px_-50px_rgba(15,23,42,0.4)]
               animate-fade-up">
@@ -45,16 +44,22 @@
     <!-- ========================================================
          MAIN CONTENT GRID
     ========================================================= -->
-    <div class="relative grid md:grid-cols-2 gap-14 px-10 py-16">
+    <div class="relative grid md:grid-cols-2 gap-20 px-12 py-24">
 
       <!-- ================= LEFT — FORM ================= -->
-      <div class="space-y-10">
+      <div class="space-y-12">
 
         <!-- Header -->
-        <div class="space-y-3">
-          <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Predict</p>
-          <h1 class="text-3xl md:text-4xl font-semibold">Predict property price</h1>
-          <p class="text-gray-600 max-w-xl">
+        <div class="space-y-4">
+          <p class="text-sm font-semibold uppercase tracking-[0.25em] text-gray-500">
+            Predict
+          </p>
+
+          <h1 class="text-4xl md:text-5xl font-semibold leading-snug">
+            Predict property price
+          </h1>
+
+          <p class="text-lg text-gray-600 max-w-xl leading-relaxed">
             Enter the essentials once, submit your details, and get an instant valuation.
           </p>
         </div>
@@ -63,14 +68,14 @@
         <!-- =====================================================
              FORM
         ====================================================== -->
-        <form method="POST" class="space-y-7">
-          <div class="grid md:grid-cols-2 gap-6">
+        <form method="POST" class="space-y-9">
+          <div class="grid md:grid-cols-2 gap-8">
 
             <!-- Property Type -->
             <div class="space-y-2">
-              <label class="text-sm font-medium text-gray-700">Property Type</label>
+              <label class="text-base font-medium text-gray-700">Property Type</label>
               <select name="Property Type"
-                      class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
+                      class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base 
                              focus:border-black focus:ring-2 focus:ring-black/10 transition">
                 <option>Apartment</option>
                 <option>Flat</option>
@@ -82,57 +87,52 @@
 
             <!-- Bedrooms -->
             <div class="space-y-2">
-              <label class="text-sm font-medium text-gray-700">Bedrooms</label>
+              <label class="text-base font-medium text-gray-700">Bedrooms</label>
               <input name="Bedrooms" type="number" min="0"
-                     class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
+                     class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base 
                             focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
             </div>
 
             <!-- Bathrooms -->
             <div class="space-y-2">
-              <label class="text-sm font-medium text-gray-700">Bathrooms</label>
+              <label class="text-base font-medium text-gray-700">Bathrooms</label>
               <input name="Bathrooms" type="number" min="0"
-                     class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
+                     class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base 
                             focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
             </div>
 
             <!-- Size -->
             <div class="space-y-2">
-              <label class="text-sm font-medium text-gray-700">Size (sqft)</label>
+              <label class="text-base font-medium text-gray-700">Size (sqft)</label>
               <input name="Size" type="number" min="0"
-                     class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
+                     class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base 
                             focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
             </div>
 
             <!-- Postcode -->
             <div class="space-y-2">
-              <label class="text-sm font-medium text-gray-700">Postcode</label>
+              <label class="text-base font-medium text-gray-700">Postcode</label>
               <input name="Postcode"
-                     class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
+                     class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base 
                             focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
             </div>
 
 
-            <!-- =====================================================
-                 AREA — SEARCHABLE GROUPED SELECT (Alpine)
-            ====================================================== -->
+            <!-- AREA SELECT -->
             <div x-data="areaSelect()" @click.outside="open = false" class="space-y-2 relative">
-              <label class="text-sm font-medium text-gray-700">Area</label>
+              <label class="text-base font-medium text-gray-700">Area</label>
 
-              <!-- Visible search bar -->
               <input 
                 x-model="search"
                 @focus="filterOptions()"
                 @input="filterOptions()"
                 type="text"
                 placeholder="Start typing (min 2 letters)…"
-                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
+                class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base 
                        focus:border-black focus:ring-2 focus:ring-black/10 transition" />
 
-              <!-- Hidden value submitted to backend -->
               <input type="hidden" name="Area" x-model="selectedValue" />
 
-              <!-- Dropdown -->
               <div 
                 x-show="open"
                 x-transition
@@ -142,12 +142,12 @@
                 <!-- Subregions -->
                 <template x-if="filteredSubregions.length">
                   <div>
-                    <div class="px-3 py-2 text-[10px] uppercase tracking-wide text-gray-500 bg-gray-50 sticky top-0">
+                    <div class="px-4 py-2 text-[11px] uppercase tracking-wide text-gray-500 bg-gray-50 sticky top-0">
                       Subregions
                     </div>
                     <template x-for="item in filteredSubregions" :key="'sub-'+item">
                       <div @click="select(item)"
-                           class="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
+                           class="px-5 py-2 cursor-pointer hover:bg-gray-100 text-base"
                            x-text="item"></div>
                     </template>
                   </div>
@@ -156,32 +156,31 @@
                 <!-- Boroughs -->
                 <template x-if="filteredBoroughs.length">
                   <div>
-                    <div class="px-3 py-2 text-[10px] uppercase tracking-wide text-gray-500 bg-gray-50 sticky top-0 border-t border-gray-200">
+                    <div class="px-4 py-2 text-[11px] uppercase tracking-wide text-gray-500 bg-gray-50 sticky top-0 border-t border-gray-200">
                       Boroughs
                     </div>
                     <template x-for="item in filteredBoroughs" :key="'bor-'+item">
                       <div @click="select(item)"
-                           class="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
+                           class="px-5 py-2 cursor-pointer hover:bg-gray-100 text-base"
                            x-text="item"></div>
                     </template>
                   </div>
                 </template>
-
               </div>
             </div>
 
           </div>
 
-          <!-- Buttons -->
-          <div class="flex justify-end gap-3">
+          <!-- BUTTONS -->
+          <div class="flex justify-end gap-4">
             <button type="reset"
-              class="px-4 py-2.5 rounded-md border border-gray-300 text-sm font-medium text-gray-800
+              class="px-5 py-3 rounded-md border border-gray-300 text-base font-medium text-gray-800
                      hover:bg-gray-100 hover:-translate-y-0.5 transition active:scale-[0.97]">
               Clear
             </button>
 
             <button
-              class="px-6 py-2.5 rounded-md bg-black text-white text-sm font-medium
+              class="px-7 py-3 rounded-md bg-black text-white text-base font-medium
                      shadow-sm hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97]
                      transition duration-300">
               Predict
@@ -195,30 +194,30 @@
 
       <!-- ========================== RIGHT — RESULT ======================= -->
       <div class="relative bg-white rounded-2xl border border-gray-200 shadow-lg shadow-gray-900/5 
-                  backdrop-blur-md p-8 space-y-6 animate-pop">
+                  backdrop-blur-md p-10 space-y-8 animate-pop">
 
-        <div class="space-y-1">
-          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">
+        <div class="space-y-2">
+          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-gray-500">
             {% if result %} Prediction result {% else %} Awaiting submission {% endif %}
           </p>
 
           {% if result %}
-            <p class="text-xl font-semibold text-gray-900">Estimated price</p>
+            <p class="text-2xl font-semibold text-gray-900">Estimated price</p>
           {% else %}
-            <p class="text-xl font-semibold text-gray-900">Your valuation will appear here</p>
+            <p class="text-2xl font-semibold text-gray-900">Your valuation will appear here</p>
           {% endif %}
         </div>
 
         {% if result %}
-          <div class="rounded-xl border border-gray-200 bg-gray-50 p-5">
-            <p class="text-sm font-medium text-gray-700">Estimated property price</p>
-            <p class="text-3xl font-bold text-gray-900 mt-1">
+          <div class="rounded-xl border border-gray-200 bg-gray-50 p-6">
+            <p class="text-base font-medium text-gray-700">Estimated property price</p>
+            <p class="text-4xl font-bold text-gray-900 mt-2">
               £{{ result|gbp }}
             </p>
-            <p class="text-xs text-gray-500 mt-1">Generated just now</p>
+            <p class="text-sm text-gray-500 mt-1">Generated just now</p>
           </div>
         {% else %}
-          <div class="rounded-xl h-20 bg-gray-100 animate-pulse"></div>
+          <div class="rounded-xl h-24 bg-gray-100 animate-pulse"></div>
         {% endif %}
       </div>
 
@@ -228,51 +227,56 @@
 
 
 <!-- ============================================================
-     HISTORY SECTION (ONLY VISIBLE WHEN LOGGED IN)
+     HISTORY SECTION (UPDATED FONTS + SPACING)
 =============================================================== -->
-<section class="max-w-[1250px] mx-auto mt-20 px-4 space-y-8 reveal-on-scroll">
+<section class="max-w-[90rem] mx-auto mt-24 px-6 space-y-10 reveal-on-scroll">
 
   {% if user_logged_in %}
 
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+    <!-- Header Row -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
-        <p class="text-sm font-semibold text-gray-700">Prediction history</p>
-        <p class="text-sm text-gray-600">Your previously submitted valuations.</p>
+        <p class="text-lg font-semibold text-gray-700">Prediction history</p>
+        <p class="text-lg text-gray-600">Your previously submitted valuations.</p>
       </div>
 
       {% if records and records|length > 0 %}
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-4">
 
         <!-- CSV EXPORT BUTTON -->
         <button id="downloadCsv"
-          class="px-4 py-2.5 rounded-md border border-gray-300 text-sm font-medium text-gray-800
+          class="px-5 py-3 rounded-md border border-gray-300 text-base font-medium text-gray-800
                  hover:bg-gray-100 hover:-translate-y-0.5 active:scale-[0.97] transition">
           Download CSV
         </button>
 
         <!-- CLEAR HISTORY BUTTON -->
         <a href="/clear_history"
-          class="px-4 py-2.5 rounded-md text-sm font-medium
-                  bg-black text-white border border-transparent
-                  hover:bg-gray-900 hover:-translate-y-0.5
-                  active:scale-[0.97] transition">
+          class="px-5 py-3 rounded-md text-base font-medium
+                 bg-black text-white border border-transparent
+                 hover:bg-gray-900 hover:-translate-y-0.5
+                 active:scale-[0.97] transition">
           Clear history
         </a>
       </div>
       {% endif %}
     </div>
 
-    {% if records and records|length > 0 %}
-    <div class="overflow-hidden rounded-2xl border border-gray-200 shadow-[0_10px_28px_-12px_rgba(15,23,42,0.25)] bg-white/70 backdrop-blur">
 
-      <!-- Table -->
-      <table id="historyTable" class="min-w-full text-sm table-auto">
+    {% if records and records|length > 0 %}
+
+    <!-- Table Wrapper -->
+    <div class="overflow-hidden rounded-2xl border border-gray-200 
+                shadow-[0_10px_28px_-12px_rgba(15,23,42,0.25)] 
+                bg-white/70 backdrop-blur">
+
+      <table id="historyTable" class="min-w-full text-base table-auto">
         <thead>
           <tr class="bg-gray-100/80 text-gray-700">
 
-            <!-- SORTABLE ID COLUMN (ICON VERSION) -->
+            <!-- SORTABLE ID COLUMN -->
             <th id="sortIdBtn"
-                class="px-5 py-3 font-semibold text-left cursor-pointer select-none">
+                class="px-6 py-4 font-semibold text-left cursor-pointer select-none">
               <span class="flex items-center gap-1">
                 ID
                 <svg id="sortIcon" xmlns="http://www.w3.org/2000/svg"
@@ -284,12 +288,12 @@
               </span>
             </th>
 
-            <th class="px-5 py-3 font-semibold text-left">Property Type</th>
-            <th class="px-5 py-3 font-semibold text-right">Bedrooms</th>
-            <th class="px-5 py-3 font-semibold text-right">Bathrooms</th>
-            <th class="px-5 py-3 font-semibold text-right">Size</th>
-            <th class="px-5 py-3 font-semibold text-right">Postcode</th>
-            <th class="px-5 py-3 font-semibold text-right">Predicted Price</th>
+            <th class="px-6 py-4 font-semibold text-left">Property Type</th>
+            <th class="px-6 py-4 font-semibold text-right">Bedrooms</th>
+            <th class="px-6 py-4 font-semibold text-right">Bathrooms</th>
+            <th class="px-6 py-4 font-semibold text-right">Size</th>
+            <th class="px-6 py-4 font-semibold text-right">Postcode</th>
+            <th class="px-6 py-4 font-semibold text-right">Predicted Price</th>
 
           </tr>
         </thead>
@@ -298,11 +302,12 @@
       </table>
     </div>
 
-    <!-- Pagination -->
-    <div class="flex justify-center items-center gap-6 mt-6 text-sm">
+
+    <!-- Pagination Controls -->
+    <div class="flex justify-center items-center gap-8 mt-6 text-base">
 
       <button id="prevPage"
-        class="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100
+        class="px-5 py-3 rounded-lg border border-gray-300 bg-white hover:bg-gray-100
                transition disabled:opacity-40 disabled:cursor-not-allowed">
         ◀ Previous
       </button>
@@ -310,25 +315,30 @@
       <div id="pageLabel" class="text-gray-700 font-medium"></div>
 
       <button id="nextPage"
-        class="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100
+        class="px-5 py-3 rounded-lg border border-gray-300 bg-white hover:bg-gray-100
                transition disabled:opacity-40 disabled:cursor-not-allowed">
         Next ▶
       </button>
 
     </div>
 
+
     {% else %}
-    <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-7 text-sm text-gray-600">
+    <!-- No Records -->
+    <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-10 
+                text-lg text-gray-600">
       No predictions yet. Use the form above to generate your first estimate.
     </div>
     {% endif %}
 
+
   {% else %}
     <!-- LOGGED OUT VIEW -->
-    <div class="rounded-xl border border-gray-200 bg-white/60 backdrop-blur p-10 text-center space-y-4">
-      <p class="text-gray-600 text-sm">Log in to view your prediction history.</p>
+    <div class="rounded-xl border border-gray-200 bg-white/60 backdrop-blur p-12 
+                text-center space-y-6">
+      <p class="text-gray-600 text-lg">Log in to view your prediction history.</p>
       <a href="/login"
-         class="inline-block px-6 py-2.5 rounded-md bg-black text-white text-sm font-medium
+         class="inline-block px-7 py-3 rounded-md bg-black text-white text-base font-medium
                 hover:bg-gray-900 transition active:scale-[0.97]">
         Sign in
       </a>
