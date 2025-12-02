@@ -1,39 +1,64 @@
-# app/ml/preprocess_precise.py
-
 import pandas as pd
-from app.ml.address_lookup import get_lat_lon
 
-def prepare_precise_input(form_dict):
+# Load the geocoded lookup table once when module loads
+addr_df = pd.read_csv("app/ml/data/Flat prices geocoded.csv")
+addr_df["address_clean"] = addr_df["address"].str.strip().str.upper()
+addr_lookup = (
+    addr_df[["address_clean", "town", "street_name", "latitude", "longitude"]]
+    .drop_duplicates("address_clean")
+    .set_index("address_clean")
+)
 
-    town = (form_dict.get("town") or "").strip()
-    street_name = (form_dict.get("street_name") or "").strip()
-    storey_range = (form_dict.get("storey_range") or "").strip()
-    flat_type = (form_dict.get("flat_type") or "").strip()
-    flat_model = (form_dict.get("flat_model") or "").strip()
-    address = (form_dict.get("address") or "").strip()
+def prepare_precise_input(form):
+    """
+    Build final row for the precise model.
+    Using ONLY these as user inputs:
+    - address
+    - storey_range
+    - flat_type
+    - flat_model
+    - floor_area_sqm
+    - remaining_lease
+    
+    And automatically derive:
+    - town
+    - street_name
+    - latitude
+    - longitude
+    """
 
-    # numbers
-    floor_area = float(form_dict.get("floor_area_sqm") or 0)
-    remaining_lease = float(form_dict.get("remaining_lease") or 0)
+    # 1. Extract from form
+    address = form["address"].strip().upper()
+    storey_range = form["storey_range"]
+    flat_type = form["flat_type"]
+    flat_model = form["flat_model"]
+    floor_area = float(form["floor_area_sqm"])
+    remaining_lease = float(form["remaining_lease"])
 
-    # REAL lat/lon lookup from dataset
-    lat, lon = get_lat_lon(address)
+    # 2. Lookup metadata (town, street_name, lat, lon)
+    if address in addr_lookup.index:
+        row = addr_lookup.loc[address]
+        town = row["town"]
+        street_name = row["street_name"]
+        latitude = float(row["latitude"])
+        longitude = float(row["longitude"])
+    else:
+        town = None
+        street_name = None
+        latitude = None
+        longitude = None
 
-    if lat is None:
-        lat = 0.0
-    if lon is None:
-        lon = 0.0
+    # 3. Build DataFrame for pipeline input
+    X = pd.DataFrame([{
+        "town": town,
+        "street_name": street_name,
+        "storey_range": storey_range,
+        "flat_type": flat_type,
+        "flat_model": flat_model,
+        "floor_area_sqm": floor_area,
+        "remaining_lease": remaining_lease,
+        "latitude": latitude,
+        "longitude": longitude,
+    }])
 
-    data = {
-        "town": [town],
-        "street_name": [street_name],
-        "storey_range": [storey_range],
-        "flat_type": [flat_type],
-        "flat_model": [flat_model],
-        "floor_area_sqm": [floor_area],
-        "remaining_lease": [remaining_lease],
-        "latitude": [lat],
-        "longitude": [lon]
-    }
-
-    return pd.DataFrame(data)
+    return X

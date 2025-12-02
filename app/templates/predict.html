@@ -163,11 +163,11 @@
           {% set error = request.args.get("error") %}
           {% if error == "missing_basic" %}
             <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              Please fill in all required fields for <span class="font-semibold">Quick Estimate</span>.
+              Please fill in all required fields.
             </div>
           {% elif error == "missing_precise" %}
             <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              Please complete all fields for <span class="font-semibold">Precise Prediction</span>.
+              Please fill in all required fields.
             </div>
           {% endif %}
         </div>
@@ -176,37 +176,45 @@
         <!-- =====================================================
             HDB PREDICTION FORM — BASIC + PRECISE
         ====================================================== -->
-        <form method="POST" class="space-y-9">
+        <form method="POST" class="space-y-9" novalidate>
 
           <!-- Hidden model selector -->
           <input type="hidden" id="modeField" name="mode" value="{{ active_mode or 'basic' }}" />
 
           <div class="grid md:grid-cols-2 gap-8">
 
-            <!-- TOWN -->
-            <div class="space-y-2">
+            <!-- FULL ADDRESS (Precise Mode only) — FIRST FIELD -->
+            <div class="space-y-2 precise-only hidden md:col-span-2">
+              <label class="text-base font-medium text-gray-700">Address</label>
+              <input name="address"
+                    placeholder="406 ANG MO KIO AVE 10"
+                    class="w-full rounded-md border px-4 py-2.5"
+                    data-precise-required="true" />
+            </div>
+
+            <!-- TOWN (BASIC MODE ONLY) -->
+            <div class="space-y-2 basic-only">
               <label class="text-base font-medium text-gray-700">Town</label>
-              <select name="town" class="w-full rounded-md border px-4 py-2.5" required>
+
+              <!-- Searchable Town Input -->
+              <input list="town-options" name="town"
+                    class="w-full rounded-md border px-4 py-2.5"
+                    placeholder="Search town..."
+                    required />
+
+              <datalist id="town-options">
                 {% for t in [
                   "ANG MO KIO","BEDOK","BISHAN","BUKIT BATOK","BUKIT MERAH","BUKIT PANJANG",
                   "BUKIT TIMAH","CHOA CHU KANG","CLEMENTI","GEYLANG","HOUGANG","JURONG EAST",
                   "JURONG WEST","KALLANG/WHAMPOA","MARINE PARADE","QUEENSTOWN","SEMBAWANG",
                   "SENGKANG","SERANGOON","TAMPINES","TOA PAYOH","WOODLANDS","YISHUN"] %}
-                  <option>{{ t }}</option>
+                  <option value="{{ t }}"></option>
                 {% endfor %}
-              </select>
+              </datalist>
             </div>
 
-            <!-- STREET NAME (Precise Mode only) -->
-            <div class="space-y-2 precise-only hidden">
-              <label class="text-base font-medium text-gray-700">Street Name</label>
-              <input name="street_name"
-                    placeholder="ANG MO KIO AVE 10"
-                    class="w-full rounded-md border px-4 py-2.5"
-                    data-precise-required="true" />
-            </div>
 
-            <!-- STOREY RANGE -->
+            <!-- STOREY RANGE (Precise only) -->
             <div class="space-y-2 precise-only hidden">
               <label class="text-base font-medium text-gray-700">Storey Range</label>
               <select name="storey_range" class="w-full rounded-md border px-4 py-2.5" data-precise-required="true">
@@ -254,15 +262,6 @@
                     class="w-full rounded-md border px-4 py-2.5" required />
             </div>
 
-            <!-- FULL ADDRESS (Precise Mode only) -->
-            <div class="space-y-2 precise-only hidden md:col-span-2">
-              <label class="text-base font-medium text-gray-700">Full Address</label>
-              <input name="address"
-                    placeholder="406 ANG MO KIO AVE 10"
-                    class="w-full rounded-md border px-4 py-2.5"
-                    data-precise-required="true" />
-            </div>
-
           </div>
 
           <!-- =====================================================
@@ -304,7 +303,6 @@
         </form>
 
       </div>
-
 
       <!-- ========================== RIGHT — RESULT ======================= -->
       <div class="relative bg-white rounded-2xl border border-gray-200 shadow-lg p-10 space-y-8">
@@ -417,60 +415,37 @@
     MODE TOGGLE SCRIPT
 =============================================================== -->
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", () => {
+    const modeField = document.getElementById("modeField");
+    const modeToggle = document.getElementById("modeToggle");
 
-  const toggle = document.getElementById("modeToggle");
-  const modeField = document.getElementById("modeField");
-  const preciseFields = document.querySelectorAll(".precise-only");
-  const preciseRequired = document.querySelectorAll("[data-precise-required='true']");
-  const predictBtn = document.getElementById("predictBtn");
+    const preciseEls = document.querySelectorAll(".precise-only");
+    const basicEls = document.querySelectorAll(".basic-only");
 
-  // Initial mode from server
-  const startMode = "{{ active_mode or 'basic' }}";
-  const isPrecise = startMode === "precise";
-  toggle.checked = isPrecise;
-  modeField.value = isPrecise ? "precise" : "basic";
+    function applyMode(mode) {
+      if (mode === "precise") {
+        modeToggle.checked = true;
+        modeField.value = "precise";
 
-  // Show or hide precise fields
-  preciseFields.forEach(f => f.classList.toggle("hidden", !isPrecise));
-  preciseRequired.forEach(el => el.required = isPrecise);
+        preciseEls.forEach(el => el.classList.remove("hidden"));
+        basicEls.forEach(el => el.classList.add("hidden"));
+      } else {
+        modeToggle.checked = false;
+        modeField.value = "basic";
 
-  function updatePreciseButtonState() {
-    if (!toggle.checked) {
-      predictBtn.disabled = false;
-      predictBtn.classList.remove("opacity-50", "cursor-not-allowed");
-      return;
+        preciseEls.forEach(el => el.classList.add("hidden"));
+        basicEls.forEach(el => el.classList.remove("hidden"));
+      }
     }
 
-    let ok = true;
-    preciseRequired.forEach(el => {
-      if (!el.value.trim()) ok = false;
+    // initial mode from backend
+    applyMode(modeField.value || "basic");
+
+    // when user toggles switch
+    modeToggle.addEventListener("change", () => {
+      applyMode(modeToggle.checked ? "precise" : "basic");
     });
-
-    predictBtn.disabled = !ok;
-    predictBtn.classList.toggle("opacity-50", !ok);
-    predictBtn.classList.toggle("cursor-not-allowed", !ok);
-  }
-
-  // Toggle behavior
-  toggle.addEventListener("change", () => {
-    const precise = toggle.checked;
-    modeField.value = precise ? "precise" : "basic";
-
-    preciseFields.forEach(f => f.classList.toggle("hidden", !precise));
-    preciseRequired.forEach(el => el.required = precise);
-
-    updatePreciseButtonState();
   });
-
-  // Watch precise fields
-  preciseRequired.forEach(el => {
-    el.addEventListener("input", updatePreciseButtonState);
-    el.addEventListener("change", updatePreciseButtonState);
-  });
-
-  updatePreciseButtonState();
-});
 </script>
 
 
@@ -646,6 +621,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+
+<!-- ============================================================
+     FORM REFILL SCRIPT
+=============================================================== -->
 <script>
 function refillForm(btn) {
 

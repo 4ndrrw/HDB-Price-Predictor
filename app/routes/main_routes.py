@@ -55,11 +55,9 @@ def predict():
             X = prepare_basic_input(form)
             result = basic_model.predict(X)[0]
 
-        else:
-            # PRECISE required fields
+        elif mode == "precise":
+            # PRECISE required fields (NO MORE TOWN & STREET NAME)
             required_fields = [
-                "town",
-                "street_name",
                 "storey_range",
                 "flat_type",
                 "flat_model",
@@ -67,10 +65,14 @@ def predict():
                 "remaining_lease",
                 "address",
             ]
+
             if any(is_empty(f) for f in required_fields):
-                # Missing precise fields → redirect with error & keep mode
                 return redirect("/predict?error=missing_precise&mode=precise")
 
+            # prepare_precise_input() will now parse:
+            # - town (derived from address)
+            # - street_name (derived from address)
+            # - latitude & longitude (lookup)
             X = prepare_precise_input(form)
             result = precise_model.predict(X)[0]
 
