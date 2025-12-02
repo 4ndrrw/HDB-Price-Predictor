@@ -41,11 +41,36 @@ def predict():
         # Which model? ("basic" or "precise")
         mode = form.get("mode", "precise")  # default = precise
 
-        # Preprocess based on mode
+        def is_empty(name: str) -> bool:
+            val = form.get(name)
+            return val is None or str(val).strip() == ""
+
         if mode == "basic":
+            # BASIC required fields
+            required_fields = ["town", "flat_type", "floor_area_sqm", "remaining_lease"]
+            if any(is_empty(f) for f in required_fields):
+                # Missing basic fields → redirect with error & keep mode
+                return redirect("/predict?error=missing_basic&mode=basic")
+
             X = prepare_basic_input(form)
             result = basic_model.predict(X)[0]
+
         else:
+            # PRECISE required fields
+            required_fields = [
+                "town",
+                "street_name",
+                "storey_range",
+                "flat_type",
+                "flat_model",
+                "floor_area_sqm",
+                "remaining_lease",
+                "address",
+            ]
+            if any(is_empty(f) for f in required_fields):
+                # Missing precise fields → redirect with error & keep mode
+                return redirect("/predict?error=missing_precise&mode=precise")
+
             X = prepare_precise_input(form)
             result = precise_model.predict(X)[0]
 
@@ -76,7 +101,7 @@ def predict():
         result=temp_result,
         records=records,
         user_logged_in=user_logged_in,
-        active_mode=active_mode
+        active_mode=active_mode,
     )
 
 

@@ -38,16 +38,25 @@ ON users(username);
         db.execute("""
 CREATE TABLE IF NOT EXISTS predictions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    -- COMMON FIELDS
+    mode TEXT,
+
+    -- BASIC MODE
     town TEXT,
-    street_name TEXT,
-    floor_area_sqm REAL,
     flat_type TEXT,
-    flat_model TEXT,
-    storey_range TEXT,
+    floor_area_sqm REAL,
     remaining_lease REAL,
-    mode TEXT,                   -- "basic" or "precise"
-    predicted_price REAL,
+
+    -- PRECISE MODE
+    street_name TEXT,
+    storey_range TEXT,
+    flat_model TEXT,
     address TEXT,
+    latitude REAL,
+    longitude REAL,
+
+    predicted_price REAL,
     timestamp TEXT,
     user_id INTEGER
 );

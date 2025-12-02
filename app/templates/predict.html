@@ -137,7 +137,7 @@
 
 
 <!-- ============================================================
-     UNIFIED HERO CARD (UPDATED FONTS + SPACING)
+     UNIFIED HERO CARD
 =============================================================== -->
 <section class="relative max-w-[90rem] mx-auto mt-24 px-6">
 
@@ -145,40 +145,31 @@
               border border-gray-200/60 shadow-[0_40px_120px_-50px_rgba(15,23,42,0.4)]
               animate-fade-up">
 
-    <!-- Floating blobs -->
-    <div class="absolute inset-0 pointer-events-none">
-      <div class="absolute -top-24 -right-28 w-80 h-80 rounded-full
-                  bg-gradient-to-br from-gray-300/60 via-white to-white blur-3xl"></div>
-      <div class="absolute -bottom-28 -left-28 w-80 h-80 rounded-full
-                  bg-gradient-to-tr from-gray-200/70 via-white to-white blur-3xl"></div>
-    </div>
-
-    <!-- Lens streak -->
-    <div class="absolute inset-0 opacity-[0.12] pointer-events-none
-                bg-[linear-gradient(115deg,rgba(255,255,255,0.3),rgba(255,255,255,0)_35%,rgba(255,255,255,0.25)_60%,rgba(255,255,255,0)_90%)]"></div>
-
-
-    <!-- ========================================================
-         MAIN CONTENT GRID
-    ========================================================= -->
     <div class="relative grid md:grid-cols-2 gap-20 px-12 py-24">
 
       <!-- ================= LEFT — FORM ================= -->
       <div class="space-y-12">
 
-        <!-- Header -->
         <div class="space-y-4">
           <p class="text-sm font-semibold uppercase tracking-[0.25em] text-gray-500">
             Predict
           </p>
-
           <h1 class="text-4xl md:text-5xl font-semibold leading-snug">
             Predict property price
           </h1>
-
           <p class="text-lg text-gray-600 max-w-xl leading-relaxed">
             Enter the essentials once, submit your details, and get an instant valuation.
           </p>
+          {% set error = request.args.get("error") %}
+          {% if error == "missing_basic" %}
+            <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              Please fill in all required fields for <span class="font-semibold">Quick Estimate</span>.
+            </div>
+          {% elif error == "missing_precise" %}
+            <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              Please complete all fields for <span class="font-semibold">Precise Prediction</span>.
+            </div>
+          {% endif %}
         </div>
 
 
@@ -187,72 +178,48 @@
         ====================================================== -->
         <form method="POST" class="space-y-9">
 
-          <!-- Hidden field that determines which model to use -->
-          <input type="hidden" id="modeField" name="mode" value="precise">
+          <!-- Hidden model selector -->
+          <input type="hidden" id="modeField" name="mode" value="{{ active_mode or 'basic' }}" />
 
           <div class="grid md:grid-cols-2 gap-8">
 
             <!-- TOWN -->
             <div class="space-y-2">
               <label class="text-base font-medium text-gray-700">Town</label>
-              <select name="town"
-                      class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base
-                            focus:border-black focus:ring-2 focus:ring-black/10 transition">
-                <option>ANG MO KIO</option>
-                <option>BEDOK</option>
-                <option>BISHAN</option>
-                <option>BUKIT BATOK</option>
-                <option>BUKIT MERAH</option>
-                <option>BUKIT PANJANG</option>
-                <option>BUKIT TIMAH</option>
-                <option>CHOA CHU KANG</option>
-                <option>CLEMENTI</option>
-                <option>GEYLANG</option>
-                <option>HOUGANG</option>
-                <option>JURONG EAST</option>
-                <option>JURONG WEST</option>
-                <option>KALLANG/WHAMPOA</option>
-                <option>MARINE PARADE</option>
-                <option>QUEENSTOWN</option>
-                <option>SEMBAWANG</option>
-                <option>SENGKANG</option>
-                <option>SERANGOON</option>
-                <option>TAMPINES</option>
-                <option>TOA PAYOH</option>
-                <option>WOODLANDS</option>
-                <option>YISHUN</option>
+              <select name="town" class="w-full rounded-md border px-4 py-2.5" required>
+                {% for t in [
+                  "ANG MO KIO","BEDOK","BISHAN","BUKIT BATOK","BUKIT MERAH","BUKIT PANJANG",
+                  "BUKIT TIMAH","CHOA CHU KANG","CLEMENTI","GEYLANG","HOUGANG","JURONG EAST",
+                  "JURONG WEST","KALLANG/WHAMPOA","MARINE PARADE","QUEENSTOWN","SEMBAWANG",
+                  "SENGKANG","SERANGOON","TAMPINES","TOA PAYOH","WOODLANDS","YISHUN"] %}
+                  <option>{{ t }}</option>
+                {% endfor %}
               </select>
             </div>
 
-            <!-- STREET NAME (only used in precise model) -->
-            <div class="space-y-2">
-              <label class="text-base font-medium text-gray-700">Street Name (Precise Mode)</label>
-              <input name="street_name" placeholder="ANG MO KIO AVE 10"
-                    class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base
-                            focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
+            <!-- STREET NAME (Precise Mode only) -->
+            <div class="space-y-2 precise-only hidden">
+              <label class="text-base font-medium text-gray-700">Street Name</label>
+              <input name="street_name"
+                    placeholder="ANG MO KIO AVE 10"
+                    class="w-full rounded-md border px-4 py-2.5"
+                    data-precise-required="true" />
             </div>
 
             <!-- STOREY RANGE -->
-            <div class="space-y-2">
+            <div class="space-y-2 precise-only hidden">
               <label class="text-base font-medium text-gray-700">Storey Range</label>
-              <select name="storey_range"
-                      class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base">
-                <option>01 TO 03</option>
-                <option>04 TO 06</option>
-                <option>07 TO 09</option>
-                <option>10 TO 12</option>
-                <option>13 TO 15</option>
-                <option>16 TO 18</option>
-                <option>19 TO 21</option>
-                <option>22 TO 24</option>
+              <select name="storey_range" class="w-full rounded-md border px-4 py-2.5" data-precise-required="true">
+                {% for r in ["01 TO 03","04 TO 06","07 TO 09","10 TO 12","13 TO 15","16 TO 18","19 TO 21","22 TO 24"] %}
+                  <option>{{ r }}</option>
+                {% endfor %}
               </select>
             </div>
 
             <!-- FLAT TYPE -->
             <div class="space-y-2">
               <label class="text-base font-medium text-gray-700">Flat Type</label>
-              <select name="flat_type"
-                      class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base">
+              <select name="flat_type" class="w-full rounded-md border px-4 py-2.5" required>
                 <option>1 ROOM</option>
                 <option>2 ROOM</option>
                 <option>3 ROOM</option>
@@ -262,22 +229,14 @@
               </select>
             </div>
 
-            <!-- FLAT MODEL -->
-            <div class="space-y-2">
+            <!-- FLAT MODEL (Precise only) -->
+            <div class="space-y-2 precise-only hidden">
               <label class="text-base font-medium text-gray-700">Flat Model</label>
-              <select name="flat_model"
-                      class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base">
-                <option>Improved</option>
-                <option>New Generation</option>
-                <option>Model A</option>
-                <option>Model A2</option>
-                <option>DBSS</option>
-                <option>Maisonette</option>
-                <option>Simplified</option>
-                <option>Standard</option>
-                <option>Terrace</option>
-                <option>Premium Apartment</option>
-                <option>Premium Apartment Loft</option>
+              <select name="flat_model" class="w-full rounded-md border px-4 py-2.5" data-precise-required="true">
+                {% for m in ["Improved","New Generation","Model A","Model A2","DBSS","Maisonette",
+                            "Simplified","Standard","Terrace","Premium Apartment","Premium Apartment Loft"] %}
+                  <option>{{ m }}</option>
+                {% endfor %}
               </select>
             </div>
 
@@ -285,50 +244,61 @@
             <div class="space-y-2">
               <label class="text-base font-medium text-gray-700">Floor Area (sqm)</label>
               <input name="floor_area_sqm" type="number" min="20"
-                    class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base"/>
+                    class="w-full rounded-md border px-4 py-2.5" required />
             </div>
 
             <!-- REMAINING LEASE -->
             <div class="space-y-2">
               <label class="text-base font-medium text-gray-700">Remaining Lease (years)</label>
-              <input name="remaining_lease" type="number" min="30"
-                    class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base"/>
+              <input name="remaining_lease" type="number" min="1"
+                    class="w-full rounded-md border px-4 py-2.5" required />
             </div>
 
-            <!-- FULL ADDRESS (geocoding) -->
-            <div class="space-y-2 md:col-span-2">
-              <label class="text-base font-medium text-gray-700">Full Address (Precise Mode)</label>
-              <input name="address" placeholder="406 ANG MO KIO AVE 10"
-                    class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base"/>
+            <!-- FULL ADDRESS (Precise Mode only) -->
+            <div class="space-y-2 precise-only hidden md:col-span-2">
+              <label class="text-base font-medium text-gray-700">Full Address</label>
+              <input name="address"
+                    placeholder="406 ANG MO KIO AVE 10"
+                    class="w-full rounded-md border px-4 py-2.5"
+                    data-precise-required="true" />
             </div>
 
           </div>
 
-          <!-- BUTTONS -->
-          <div class="flex justify-end gap-4">
+          <!-- =====================================================
+              ACTION BAR — CLEAR • TOGGLE • PREDICT
+          ====================================================== -->
+          <div class="flex items-center gap-8 pt-6">
+
+            <!-- CLEAR BUTTON -->
             <button type="reset"
-              class="px-5 py-3 rounded-md border border-gray-300 text-base font-medium text-gray-800
-                    hover:bg-gray-100 hover:-translate-y-0.5 transition active:scale-[0.97]">
+              class="px-6 py-3 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50">
               Clear
             </button>
 
-            <!-- QUICK MODEL BUTTON -->
-            <button type="submit"
-                    onclick="document.getElementById('modeField').value='basic'"
-                    class="px-7 py-3 rounded-md bg-gray-700 text-white text-base font-medium
-                          shadow-sm hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97]
-                          transition duration-300">
-              Quick Estimate
+            <!-- MODE TOGGLE -->
+            <div class="flex items-center gap-3 select-none">
+              <span class="text-sm font-medium text-gray-700">Quick</span>
+
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="modeToggle" class="sr-only peer">
+
+                <div class="w-14 h-7 bg-gray-300 rounded-full peer-focus:ring-2 peer-focus:ring-blue-500
+                            peer-checked:bg-blue-600 transition-all duration-300"></div>
+
+                <div class="absolute left-1 top-1 w-5 h-5 bg-white rounded-full shadow
+                            peer-checked:translate-x-7 transform transition-all duration-300"></div>
+              </label>
+
+              <span class="text-sm font-medium text-gray-700">Precise</span>
+            </div>
+
+            <!-- SINGLE PREDICT BUTTON -->
+            <button type="submit" id="predictBtn"
+                    class="px-8 py-3 bg-black text-white rounded-md hover:bg-gray-900 transition">
+              Predict
             </button>
 
-            <!-- PRECISE MODEL BUTTON -->
-            <button type="submit"
-                    onclick="document.getElementById('modeField').value='precise'"
-                    class="px-7 py-3 rounded-md bg-black text-white text-base font-medium
-                          shadow-sm hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97]
-                          transition duration-300">
-              Precise Prediction
-            </button>
           </div>
 
         </form>
@@ -337,11 +307,10 @@
 
 
       <!-- ========================== RIGHT — RESULT ======================= -->
-      <div class="relative bg-white rounded-2xl border border-gray-200 shadow-lg shadow-gray-900/5 
-                  backdrop-blur-md p-10 space-y-8 animate-pop">
+      <div class="relative bg-white rounded-2xl border border-gray-200 shadow-lg p-10 space-y-8">
 
         <div class="space-y-2">
-          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-gray-500">
+          <p class="text-sm uppercase tracking-[0.18em] text-gray-500">
             {% if result %} Prediction result {% else %} Awaiting submission {% endif %}
           </p>
 
@@ -353,10 +322,10 @@
         </div>
 
         {% if result %}
-          <div class="rounded-xl border border-gray-200 bg-gray-50 p-6">
-            <p class="text-base font-medium text-gray-700">Estimated property price</p>
-            <p class="text-4xl font-bold text-gray-900 mt-2">
-              £{{ result|gbp }}
+          <div class="rounded-xl border bg-gray-50 p-6">
+            <p class="text-base">Estimated property price</p>
+            <p class="text-4xl font-bold mt-2">
+              {{ "${:,.2f}".format(result|float).replace(',', '    ') }}
             </p>
             <p class="text-sm text-gray-500 mt-1">Generated just now</p>
           </div>
@@ -371,93 +340,66 @@
 
 
 <!-- ============================================================
-     HISTORY SECTION (UPDATED FONTS + SPACING)
+     HISTORY SECTION
 =============================================================== -->
-<section class="max-w-[90rem] mx-auto mt-24 px-6 space-y-10 reveal-on-scroll">
+<section class="max-w-[90rem] mx-auto mt-24 px-6 space-y-10">
 
   {% if user_logged_in %}
-
-    <!-- Header Row -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div>
-        <p class="text-lg font-semibold text-gray-700">Prediction history</p>
-        <p class="text-lg text-gray-600">Your previously submitted HDB valuations.</p>
-      </div>
+    <div class="flex flex-col gap-4">
+      <p class="text-lg font-semibold text-gray-700">Prediction history</p>
+      <p class="text-lg text-gray-600">Your past HDB valuations.</p>
     </div>
 
-    <!-- History Table -->
     {% if records and records|length > 0 %}
       <div class="overflow-x-auto mt-6">
         <table class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
           <thead class="bg-gray-50 text-gray-700 text-sm">
             <tr>
-              <th class="px-4 py-3 text-left font-medium">Town</th>
-              <th class="px-4 py-3 text-left font-medium">Street</th>
-              <th class="px-4 py-3 text-left font-medium">Floor Area (sqm)</th>
-              <th class="px-4 py-3 text-left font-medium">Flat Type</th>
-              <th class="px-4 py-3 text-left font-medium">Model</th>
-              <th class="px-4 py-3 text-left font-medium">Storey</th>
-              <th class="px-4 py-3 text-left font-medium">Lease (yrs)</th>
-              <th class="px-4 py-3 text-left font-medium">Mode</th>
-              <th class="px-4 py-3 text-left font-medium">Predicted Price ($)</th>
+              <th class="px-4 py-3 text-left">Town</th>
+              <th class="px-4 py-3 text-left">Street</th>
+              <th class="px-4 py-3 text-left">Area (sqm)</th>
+              <th class="px-4 py-3 text-left">Flat Type</th>
+              <th class="px-4 py-3 text-left">Model</th>
+              <th class="px-4 py-3 text-left">Storey</th>
+              <th class="px-4 py-3 text-left">Lease (yrs)</th>
+              <th class="px-4 py-3 text-left">Mode</th>
+              <th class="px-4 py-3 text-left">Price</th>
             </tr>
           </thead>
 
-          <tbody class="divide-y divide-gray-200 text-gray-800 text-sm">
-            {% for row in records %}
+          <tbody class="divide-y divide-gray-200 text-sm">
+            {% for r in records %}
             <tr>
-              <td class="px-4 py-3">{{ row.town }}</td>
+              <td class="px-4 py-3">{{ r.town }}</td>
 
-              <!-- Street Name (Precise only) -->
               <td class="px-4 py-3">
-                {% if row.mode == "precise" %}
-                  {{ row.street_name }}
+                {% if r.mode == "precise" %} {{ r.street_name }} {% else %} — {% endif %}
+              </td>
+
+              <td class="px-4 py-3">{{ r.floor_area_sqm }}</td>
+              <td class="px-4 py-3">{{ r.flat_type }}</td>
+
+              <td class="px-4 py-3">
+                {% if r.mode == "precise" %} {{ r.flat_model }} {% else %} — {% endif %}
+              </td>
+
+              <td class="px-4 py-3">
+                {% if r.mode == "precise" %} {{ r.storey_range }} {% else %} — {% endif %}
+              </td>
+
+              <td class="px-4 py-3">{{ r.remaining_lease }}</td>
+
+              <td class="px-4 py-3">
+                {% if r.mode == "precise" %}
+                  <span class="px-2 py-1 text-xs bg-black text-white rounded">Precise</span>
                 {% else %}
-                  —
+                  <span class="px-2 py-1 text-xs bg-gray-700 text-white rounded">Basic</span>
                 {% endif %}
               </td>
 
-              <!-- Floor Area -->
-              <td class="px-4 py-3">{{ row.floor_area_sqm }}</td>
-
-              <!-- Flat Type -->
-              <td class="px-4 py-3">{{ row.flat_type }}</td>
-
-              <!-- Flat Model (Precise only) -->
-              <td class="px-4 py-3">
-                {% if row.mode == "precise" %}
-                  {{ row.flat_model }}
-                {% else %}
-                  —
-                {% endif %}
-              </td>
-
-              <!-- Storey -->
-              <td class="px-4 py-3">
-                {% if row.mode == "precise" %}
-                  {{ row.storey_range }}
-                {% else %}
-                  —
-                {% endif %}
-              </td>
-
-              <!-- Remaining Lease -->
-              <td class="px-4 py-3">{{ row.remaining_lease }}</td>
-
-              <!-- Mode Tag -->
-              <td class="px-4 py-3">
-                {% if row.mode == "precise" %}
-                  <span class="px-2 py-1 text-xs bg-black text-white rounded-md">Precise</span>
-                {% else %}
-                  <span class="px-2 py-1 text-xs bg-gray-700 text-white rounded-md">Basic</span>
-                {% endif %}
-              </td>
-
-              <!-- Predicted Price -->
               <td class="px-4 py-3 font-semibold text-gray-900">
-                ${{ "{:,.0f}".format(row.prediction) }}
+                {{ "${:,.0f}".format(r.predicted_price|float) if r.predicted_price is not none else "N/A" }}
               </td>
-
             </tr>
             {% endfor %}
           </tbody>
@@ -465,93 +407,73 @@
       </div>
 
     {% else %}
-
       <p class="text-gray-500 mt-4">No previous predictions yet.</p>
-
     {% endif %}
   {% endif %}
 </section>
 
 
 <!-- ============================================================
-     AREA SELECT SCRIPT (Alpine)
+    MODE TOGGLE SCRIPT
 =============================================================== -->
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-
 <script>
-function areaSelect() {
-  return {
-    open: false,
-    search: "",
-    selectedValue: "",
+document.addEventListener("DOMContentLoaded", () => {
 
-    subregions: [
-      "Eastern",
-      "South Western",
-      "Western Central",
-      "South Eastern",
-      "North Western",
-      "Western and Paddington",
-      "Northern",
-      "Eastern Central"
-    ],
+  const toggle = document.getElementById("modeToggle");
+  const modeField = document.getElementById("modeField");
+  const preciseFields = document.querySelectorAll(".precise-only");
+  const preciseRequired = document.querySelectorAll("[data-precise-required='true']");
+  const predictBtn = document.getElementById("predictBtn");
 
-    boroughs: [
-      "Enfield",
-      "Twickenham",
-      "Harrow",
-      "Kingston upon Thames",
-      "Croydon",
-      "Bromley",
-      "Ilford",
-      "Sutton",
-      "Kingston"
-    ],
+  // Initial mode from server
+  const startMode = "{{ active_mode or 'basic' }}";
+  const isPrecise = startMode === "precise";
+  toggle.checked = isPrecise;
+  modeField.value = isPrecise ? "precise" : "basic";
 
-    filteredSubregions: [],
-    filteredBoroughs: [],
+  // Show or hide precise fields
+  preciseFields.forEach(f => f.classList.toggle("hidden", !isPrecise));
+  preciseRequired.forEach(el => el.required = isPrecise);
 
-    init() {
-      // start with no suggestions shown
-      this.filteredSubregions = [];
-      this.filteredBoroughs = [];
-    },
-
-    filterOptions() {
-      const q = this.search.trim().toLowerCase();
-
-      // Require at least 2 characters
-      if (q.length < 2) {
-        this.filteredSubregions = [];
-        this.filteredBoroughs = [];
-        this.open = false;
-        this.selectedValue = "";
-        return;
-      }
-
-      this.filteredSubregions = this.subregions.filter(a =>
-        a.toLowerCase().includes(q)
-      );
-      this.filteredBoroughs = this.boroughs.filter(a =>
-        a.toLowerCase().includes(q)
-      );
-
-      // Auto-select if there's an exact match (user types full name)
-      const allAreas = [...this.subregions, ...this.boroughs];
-      const exact = allAreas.find(a => a.toLowerCase() === q);
-      this.selectedValue = exact || "";
-
-      this.open = (this.filteredSubregions.length || this.filteredBoroughs.length);
-    },
-
-    select(value) {
-      this.search = value;
-      this.selectedValue = value;
-      this.open = false;
+  function updatePreciseButtonState() {
+    if (!toggle.checked) {
+      predictBtn.disabled = false;
+      predictBtn.classList.remove("opacity-50", "cursor-not-allowed");
+      return;
     }
+
+    let ok = true;
+    preciseRequired.forEach(el => {
+      if (!el.value.trim()) ok = false;
+    });
+
+    predictBtn.disabled = !ok;
+    predictBtn.classList.toggle("opacity-50", !ok);
+    predictBtn.classList.toggle("cursor-not-allowed", !ok);
   }
-}
+
+  // Toggle behavior
+  toggle.addEventListener("change", () => {
+    const precise = toggle.checked;
+    modeField.value = precise ? "precise" : "basic";
+
+    preciseFields.forEach(f => f.classList.toggle("hidden", !precise));
+    preciseRequired.forEach(el => el.required = precise);
+
+    updatePreciseButtonState();
+  });
+
+  // Watch precise fields
+  preciseRequired.forEach(el => {
+    el.addEventListener("input", updatePreciseButtonState);
+    el.addEventListener("change", updatePreciseButtonState);
+  });
+
+  updatePreciseButtonState();
+});
 </script>
+
+
 
 {% if user_logged_in %}
 <!-- ============================================================
@@ -575,7 +497,7 @@ document.addEventListener("DOMContentLoaded", () => {
         postcode: "{{ r.postcode }}",
         area: "{{ r.area }}",   // <-- ADDED
         price_raw: {% if r.predicted_price is not none %}{{ r.predicted_price }}{% else %}null{% endif %},
-        price_display: `{% if r.predicted_price is not none %}£{{ "{:,.2f}".format(r.predicted_price).replace(',', ' ') }}{% else %}N/A{% endif %}`
+        price_display: {{ "${:,.2f}".format(r.predicted_price) if r.predicted_price is not none else "N/A" }}
       },
     {% endfor %}
   ];
