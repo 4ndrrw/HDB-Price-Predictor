@@ -1,7 +1,6 @@
 from datetime import datetime
 from flask import session
 from app.database import get_db
-from app.ml.area_lookup import AREA_AVG_PRICE   # <-- we use the same dict as preprocess.py
 
 
 class PredictionHistory:
@@ -9,50 +8,54 @@ class PredictionHistory:
     @staticmethod
     def save(data, prediction):
         """
-        Saves prediction results to the database.
+        Saves HDB prediction results to the database.
+        Works for both BASIC and PRECISE modes.
         Only saves if a user is logged in.
         """
 
-        # ---------------------------------------
-        # Check login state
-        # ---------------------------------------
         user_id = session.get("user_id")
         if user_id is None:
-            # Not logged in → do not record history
-            return
+            return  # not logged in → no history saved
 
-        # --- Extract required fields ---
-        bedrooms = data.get("Bedrooms")
-        bathrooms = data.get("Bathrooms")
-        size = data.get("Size")
-        property_type = data.get("Property Type")
-        area = (data.get("Area") or "").strip()
-        postcode = data.get("Postcode")
+        # -----------------------------
+        # Extract fields from form data
+        # -----------------------------
+        town = data.get("town")
+        street_name = data.get("street_name")      # precise only
+        floor_area = data.get("floor_area_sqm")
+        flat_type = data.get("flat_type")
+        flat_model = data.get("flat_model")        # precise only
+        storey_range = data.get("storey_range")    # precise only
+        remaining_lease = data.get("remaining_lease")
+        address = data.get("address")              # precise only
+        mode = data.get("mode", "precise")         # "basic" or "precise"
         price = float(prediction)
 
-        # --- Compute Area_Avg_Price ---
-        area_avg_price = AREA_AVG_PRICE.get(area, 0.0)
-
-        # --- DB Insert (including user_id) ---
+        # -----------------------------
+        # Insert into DB
+        # -----------------------------
         db = get_db()
         db.execute(
             """
             INSERT INTO predictions
-            (bedrooms, bathrooms, size, area_avg_price, property_type, area,
-             postcode, predicted_price, timestamp, user_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (town, street_name, floor_area_sqm, flat_type, flat_model,
+             storey_range, remaining_lease, mode, predicted_price,
+             address, timestamp, user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
-                bedrooms,
-                bathrooms,
-                size,
-                area_avg_price,
-                property_type,
-                area,
-                postcode,
+                town,
+                street_name,
+                floor_area,
+                flat_type,
+                flat_model,
+                storey_range,
+                remaining_lease,
+                mode,
                 price,
+                address,
                 datetime.now().isoformat(),
-                user_id,
+                user_id
             ),
         )
         db.commit()
@@ -60,43 +63,38 @@ class PredictionHistory:
     @staticmethod
     def get_all(user_id):
         """
-        Return prediction history ONLY for this user.
-        If user_id is None → return empty list.
+        Returns this user's HDB prediction history formatted for the template.
         """
 
         if user_id is None:
-            return []  # logged-out → no history shown
+            return []
 
         db = get_db()
         rows = db.execute(
             """
-            SELECT * FROM predictions
+            SELECT *
+            FROM predictions
             WHERE user_id = ?
-            ORDER BY id ASC
+            ORDER BY id DESC
             """,
-            (user_id,),
+            (user_id,)
         ).fetchall()
 
         cleaned = []
         for r in rows:
-            raw = r["predicted_price"]
-            try:
-                if isinstance(raw, (bytes, bytearray)):
-                    price = float(raw.decode("utf-8"))
-                else:
-                    price = float(raw)
-            except Exception:
-                price = None
-
             cleaned.append({
                 "id": r["id"],
-                "property_type": r["property_type"],
-                "bedrooms": r["bedrooms"],
-                "bathrooms": r["bathrooms"],
-                "size": r["size"],
-                "area": r["area"],
-                "postcode": r["postcode"],
-                "predicted_price": price,
+                "town": r["town"],
+                "street_name": r["street_name"],
+                "floor_area_sqm": r["floor_area_sqm"],
+                "flat_type": r["flat_type"],
+                "flat_model": r["flat_model"],
+                "storey_range": r["storey_range"],
+                "remaining_lease": r["remaining_lease"],
+                "mode": r["mode"],
+                "prediction": r["predicted_price"],
+                "address": r["address"],
+                "timestamp": r["timestamp"],
             })
 
         return cleaned

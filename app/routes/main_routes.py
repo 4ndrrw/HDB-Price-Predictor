@@ -1,14 +1,18 @@
 from flask import Blueprint, redirect, render_template, request, session
-from joblib import load
+import joblib
 
-from app.ml.preprocess import prepare_input
+from app.ml.preprocess_basic import prepare_basic_input
+from app.ml.preprocess_precise import prepare_precise_input
 from app.models.prediction import PredictionHistory
 from app.database import get_db
 
 main_bp = Blueprint("main", __name__)
 
-# Load ML model once
-model = load("app/ml/model.pkl")
+# -----------------------------
+# Load both models (HDB)
+# -----------------------------
+basic_model = joblib.load("app/ml/rf_model_basic.pkl")
+precise_model = joblib.load("app/ml/rf_model_precise.pkl")
 
 
 # -----------------------------
@@ -25,44 +29,59 @@ def index():
 @main_bp.route("/predict", methods=["GET", "POST"])
 def predict():
 
-    user_id = session.get("user_id")      # <-- Logged-in user?
-    user_logged_in = user_id is not None  # <-- Boolean flag for template logic
+    user_id = session.get("user_id")
+    user_logged_in = user_id is not None
 
     # -----------------------------
-    # POST → generate prediction
+    # POST → Generate Prediction
     # -----------------------------
     if request.method == "POST":
         form = request.form.to_dict()
-        X = prepare_input(form)
-        result = model.predict(X)[0]
+
+        # Which model? ("basic" or "precise")
+        mode = form.get("mode", "precise")  # default = precise
+
+        # Preprocess based on mode
+        if mode == "basic":
+            X = prepare_basic_input(form)
+            result = basic_model.predict(X)[0]
+        else:
+            X = prepare_precise_input(form)
+            result = precise_model.predict(X)[0]
+
+        # Store mode so history can differentiate
+        form["mode"] = mode
 
         # Save ONLY if logged in
-        PredictionHistory.save(form, result)
+        if user_logged_in:
+            PredictionHistory.save(form, result)
 
-        # PRG redirect
-        return redirect(f"/predict?temp_result={result}")
+        # PRG pattern
+        return redirect(f"/predict?temp_result={result}&mode={mode}")
 
     # -----------------------------
-    # GET → show form + optional result + history
+    # GET → Show Form + Optional Result + History
     # -----------------------------
     temp_result = request.args.get("temp_result")
+    active_mode = request.args.get("mode", "precise")
 
-    # Load only this user's records
+    # Load this user's records
     if user_logged_in:
         records = PredictionHistory.get_all(user_id)
     else:
-        records = None   # logged out → no history
+        records = None
 
     return render_template(
         "predict.html",
         result=temp_result,
         records=records,
-        user_logged_in=user_logged_in
+        user_logged_in=user_logged_in,
+        active_mode=active_mode
     )
 
 
 # -----------------------------
-# Clear History (Per-user)
+# Clear History (per-user)
 # -----------------------------
 @main_bp.route("/clear_history")
 def clear_history():
@@ -78,11 +97,3 @@ def clear_history():
     db.commit()
 
     return redirect("/predict")
-
-
-# -----------------------------
-# Test Page
-# -----------------------------
-@main_bp.route("/test")
-def test_page():
-    return open("app/test.html").read()
