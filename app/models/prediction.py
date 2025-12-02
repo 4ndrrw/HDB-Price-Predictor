@@ -94,6 +94,7 @@ class PredictionHistory:
                 "bedrooms": r["bedrooms"],
                 "bathrooms": r["bathrooms"],
                 "size": r["size"],
+                "area": r["area"],
                 "postcode": r["postcode"],
                 "predicted_price": price,
             })

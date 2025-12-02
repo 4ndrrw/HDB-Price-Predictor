@@ -191,7 +191,7 @@
             <!-- Property Type -->
             <div class="space-y-2">
               <label class="text-base font-medium text-gray-700">Property Type</label>
-              <select name="Property Type"
+              <select id="field_property_type" name="Property Type"
                       class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base 
                              focus:border-black focus:ring-2 focus:ring-black/10 transition">
                 <option>Apartment</option>
@@ -205,7 +205,7 @@
             <!-- Bedrooms -->
             <div class="space-y-2">
               <label class="text-base font-medium text-gray-700">Bedrooms</label>
-              <input name="Bedrooms" type="number" min="0"
+              <input id="field_bedrooms" name="Bedrooms" type="number" min="0"
                      class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base 
                             focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
             </div>
@@ -213,7 +213,7 @@
             <!-- Bathrooms -->
             <div class="space-y-2">
               <label class="text-base font-medium text-gray-700">Bathrooms</label>
-              <input name="Bathrooms" type="number" min="0"
+              <input id="field_bathrooms" name="Bathrooms" type="number" min="0"
                      class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base 
                             focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
             </div>
@@ -221,7 +221,7 @@
             <!-- Size -->
             <div class="space-y-2">
               <label class="text-base font-medium text-gray-700">Size (sqft)</label>
-              <input name="Size" type="number" min="0"
+              <input id="field_size" name="Size" type="number" min="0"
                      class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base 
                             focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
             </div>
@@ -229,7 +229,7 @@
             <!-- Postcode -->
             <div class="space-y-2">
               <label class="text-base font-medium text-gray-700">Postcode</label>
-              <input name="Postcode"
+              <input id="field_postcode" name="Postcode"
                      class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base 
                             focus:border-black focus:ring-2 focus:ring-black/10 transition"/>
             </div>
@@ -239,7 +239,7 @@
             <div x-data="areaSelect()" @click.outside="open = false" class="space-y-2 relative">
               <label class="text-base font-medium text-gray-700">Area</label>
 
-              <input 
+              <input id="field_area_search" 
                 x-model="search"
                 @focus="filterOptions()"
                 @input="filterOptions()"
@@ -248,7 +248,7 @@
                 class="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-base 
                        focus:border-black focus:ring-2 focus:ring-black/10 transition" />
 
-              <input type="hidden" name="Area" x-model="selectedValue" />
+              <input id="field_area_hidden" type="hidden" name="Area" x-model="selectedValue" />
 
               <div 
                 x-show="open"
@@ -391,26 +391,29 @@
         <thead>
           <tr class="bg-gray-100/80 text-gray-700">
 
-            <!-- SORTABLE ID COLUMN -->
+            <!-- ID (left) -->
             <th id="sortIdBtn"
-                class="px-6 py-4 font-semibold text-left cursor-pointer select-none">
+                class="px-4 py-4 font-semibold text-left cursor-pointer select-none">
               <span class="flex items-center gap-1">
                 ID
                 <svg id="sortIcon" xmlns="http://www.w3.org/2000/svg"
-                     class="h-3 w-3 text-gray-500 transition-transform duration-200"
-                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    class="h-3 w-3 text-gray-500 transition-transform duration-200"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M5 15l7-7 7 7" />
                 </svg>
               </span>
             </th>
 
-            <th class="px-6 py-4 font-semibold text-left">Property Type</th>
-            <th class="px-6 py-4 font-semibold text-right">Bedrooms</th>
-            <th class="px-6 py-4 font-semibold text-right">Bathrooms</th>
-            <th class="px-6 py-4 font-semibold text-right">Size</th>
-            <th class="px-6 py-4 font-semibold text-right">Postcode</th>
-            <th class="px-6 py-4 font-semibold text-right">Predicted Price</th>
+            <!-- ALL OTHER COLUMNS CENTERED -->
+            <th class="px-4 py-4 font-semibold text-center">Property Type</th>
+            <th class="px-4 py-4 font-semibold text-center">Bedrooms</th>
+            <th class="px-4 py-4 font-semibold text-center">Bathrooms</th>
+            <th class="px-4 py-4 font-semibold text-center">Size</th>
+            <th class="px-4 py-4 font-semibold text-center">Postcode</th>
+            <th class="px-4 py-4 font-semibold text-center">Area</th>
+            <th class="px-4 py-4 font-semibold text-center">Predicted Price</th>
+            <th class="px-4 py-4 font-semibold text-center">Refill</th>
 
           </tr>
         </thead>
@@ -461,7 +464,6 @@
       </a>
     </div>
   {% endif %}
-
 </section>
 
 
@@ -558,13 +560,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let rows = [
     {% for r in records %}
       {
-        real_id: {{ r.id }},    // <-- real DB id
-        display_id: null,       // <-- per-user index (1,2,3...)
+        real_id: {{ r.id }},
+        display_id: null,
         property_type: "{{ r.property_type }}",
         bedrooms: "{{ r.bedrooms }}",
         bathrooms: "{{ r.bathrooms }}",
         size: "{{ r.size }}",
         postcode: "{{ r.postcode }}",
+        area: "{{ r.area }}",   // <-- ADDED
         price_raw: {% if r.predicted_price is not none %}{{ r.predicted_price }}{% else %}null{% endif %},
         price_display: `{% if r.predicted_price is not none %}£{{ "{:,.2f}".format(r.predicted_price).replace(',', ' ') }}{% else %}N/A{% endif %}`
       },
@@ -599,7 +602,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const rowsPerPage = 10;
   let ascending = true;
 
-  // default sort by display_id
   rows.sort((a, b) => a.display_id - b.display_id);
   sortIcon.style.transform = "rotate(0deg)";
 
@@ -617,13 +619,40 @@ document.addEventListener("DOMContentLoaded", () => {
       tr.className = "transition-all duration-200 hover:bg-gray-100/60";
 
       tr.innerHTML = `
-        <td class="px-5 py-3">${row.display_id}</td>
-        <td class="px-5 py-3">${row.property_type}</td>
-        <td class="px-5 py-3 text-right">${row.bedrooms}</td>
-        <td class="px-5 py-3 text-right">${row.bathrooms}</td>
-        <td class="px-5 py-3 text-right">${row.size}</td>
-        <td class="px-5 py-3 text-right">${row.postcode}</td>
-        <td class="px-5 py-3 text-right font-semibold font-mono">${row.price_display}</td>
+        <td class="px-4 py-3 text-left">${row.display_id}</td>
+        <td class="px-4 py-3 text-center">${row.property_type}</td>
+        <td class="px-4 py-3 text-center">${row.bedrooms}</td>
+        <td class="px-4 py-3 text-center">${row.bathrooms}</td>
+        <td class="px-4 py-3 text-center">${row.size}</td>
+        <td class="px-4 py-3 text-center">${row.postcode}</td>
+        <td class="px-4 py-3 text-center">${row.area}</td>
+        <td class="px-4 py-3 text-center font-semibold font-mono">${row.price_display}</td>
+
+        <td class="px-3 py-3 text-center">
+          <button 
+            class="p-2 rounded-full border border-[#d9b582]/40 bg-white hover:bg-[#d9b582]/10 transition group"
+            data-prop="${row.property_type}"
+            data-bed="${row.bedrooms}"
+            data-bath="${row.bathrooms}"
+            data-size="${row.size}"
+            data-post="${row.postcode}"
+            data-area="${row.area}"
+            onclick="refillForm(this)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-[#d9b582] group-hover:text-black transition"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4.5 9A7.5 7.5 0 0112 4.5c2.1 0 4.1.9 5.5 2.5" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M19.5 15A7.5 7.5 0 0112 19.5c-2.1 0-4.1-.9-5.5-2.5" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4 4v5h5" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M20 20v-5h-5" />
+            </svg>
+          </button>
+        </td>
       `;
       tableBody.appendChild(tr);
     });
@@ -662,10 +691,9 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // -------------------------------
-  // CSV Download (exports REAL DB id)
+  // CSV Download
   // -------------------------------
   downloadBtn.onclick = () => {
-
     let csv = "Real ID,Display ID,Property Type,Bedrooms,Bathrooms,Size,Postcode,Predicted Price\n";
 
     rows.forEach(r => {
@@ -689,5 +717,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 </script>
+
+<script>
+function refillForm(btn) {
+
+  // BASIC FIELDS
+  document.getElementById("field_property_type").value = btn.dataset.prop;
+  document.getElementById("field_bedrooms").value      = btn.dataset.bed;
+  document.getElementById("field_bathrooms").value     = btn.dataset.bath;
+  document.getElementById("field_size").value          = btn.dataset.size;
+  document.getElementById("field_postcode").value      = btn.dataset.post;
+
+  // AREA FIELD
+  const areaSearch   = document.getElementById("field_area_search");
+  const areaSelected = document.getElementById("field_area_hidden");
+
+  if (areaSearch && areaSelected) {
+    areaSearch.value   = btn.dataset.area;
+    areaSelected.value = btn.dataset.area;
+
+    // Trigger Alpine filtering
+    areaSearch.dispatchEvent(new Event("input"));
+  }
+
+  // Scroll back to form
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+</script>
+
 {% endif %}
 {% endblock %}

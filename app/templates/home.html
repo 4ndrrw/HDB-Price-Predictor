@@ -180,14 +180,16 @@
                     transition-all duration-300">
             Start a prediction
           </a>
-          <a href="/login"
-             class="px-8 py-3.5 rounded-full text-base font-medium
-                    border border-gray-300 text-gray-800
-                    hover:bg-gray-100 hover:-translate-y-0.5 
-                    hover:shadow-[0_6px_18px_rgba(0,0,0,0.12)]
-                    active:scale-[0.97] transition-all duration-300">
-            Sign in
-          </a>
+          {% if not session.get("user_id") %}
+            <a href="/login"
+              class="px-8 py-3.5 rounded-full text-base font-medium
+                      border border-gray-300 text-gray-800
+                      hover:bg-gray-100 hover:-translate-y-0.5 
+                      hover:shadow-[0_6px_18px_rgba(0,0,0,0.12)]
+                      active:scale-[0.97] transition-all duration-300">
+              Sign in
+            </a>
+          {% endif %}
         </div>
 
         <!-- Scroll cue -->
@@ -245,8 +247,6 @@
     </section>
   </div>
 </div>
-
-
 
 
 <!-- ============================================================
