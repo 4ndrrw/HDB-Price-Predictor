@@ -192,49 +192,123 @@
                     data-precise-required="true" />
             </div>
 
-            <!-- TOWN (BASIC MODE ONLY) -->
-            <div class="space-y-2 basic-only">
+            <!-- TOWN (BASIC MODE ONLY, ALPINE SEARCH DROPDOWN) -->
+            <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>
+            <div class="space-y-2 basic-only relative" x-data="hdbTownSelect()" @click.outside="open = false">
               <label class="text-base font-medium text-gray-700">Town</label>
 
-              <!-- Searchable Town Input -->
-              <input list="town-options" name="town"
-                    class="w-full rounded-md border px-4 py-2.5"
-                    placeholder="Search town..."
-                    required />
+              <input
+                x-model="query"
+                @focus="open = true"
+                @keydown.arrow-down.prevent="highlightNext()"
+                @keydown.arrow-up.prevent="highlightPrev()"
+                @keydown.enter.prevent="selectHighlighted()"
+                name="town"
+                placeholder="Search town..."
+                class="w-full rounded-md border px-4 py-2.5"
+                autocomplete="off"
+                required
+              />
 
-              <datalist id="town-options">
-                {% for t in [
-                  "ANG MO KIO","BEDOK","BISHAN","BUKIT BATOK","BUKIT MERAH","BUKIT PANJANG",
-                  "BUKIT TIMAH","CHOA CHU KANG","CLEMENTI","GEYLANG","HOUGANG","JURONG EAST",
-                  "JURONG WEST","KALLANG/WHAMPOA","MARINE PARADE","QUEENSTOWN","SEMBAWANG",
-                  "SENGKANG","SERANGOON","TAMPINES","TOA PAYOH","WOODLANDS","YISHUN"] %}
-                  <option value="{{ t }}"></option>
-                {% endfor %}
-              </datalist>
+              <!-- dropdown -->
+              <ul
+                x-show="open"
+                class="absolute z-20 mt-1 w-full bg-white border rounded-md shadow-md max-h-60 overflow-y-auto"
+              >
+                <template x-for="(town, index) in filtered" :key="town">
+                  <li
+                    @click="choose(town)"
+                    :class="{
+                      'bg-gray-100': index === highlighted,
+                      'cursor-pointer px-4 py-2 hover:bg-gray-200': true
+                    }"
+                    x-text="town"
+                  ></li>
+                </template>
+
+                <li x-show="filtered.length === 0"
+                    class="px-4 py-2 text-gray-500 select-none">
+                  No matches found
+                </li>
+              </ul>
             </div>
 
+            <!-- STOREY RANGE (Alpine Dropdown) -->
+            <div class="space-y-2 precise-only hidden relative"
+                x-data="storeySelect()" @click.outside="open = false">
 
-            <!-- STOREY RANGE (Precise only) -->
-            <div class="space-y-2 precise-only hidden">
               <label class="text-base font-medium text-gray-700">Storey Range</label>
-              <select name="storey_range" class="w-full rounded-md border px-4 py-2.5" data-precise-required="true">
-                {% for r in ["01 TO 03","04 TO 06","07 TO 09","10 TO 12","13 TO 15","16 TO 18","19 TO 21","22 TO 24"] %}
-                  <option>{{ r }}</option>
-                {% endfor %}
-              </select>
+
+              <div @click="open = !open"
+                  class="w-full rounded-md border px-4 py-2.5 cursor-pointer flex justify-between items-center">
+                <span x-text="selectedLabel || 'Select range'"></span>
+                <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+
+              <!-- Hidden raw value actually sent -->
+              <input type="hidden" name="storey_range" x-model="selectedRaw" data-precise-required="true">
+
+              <div x-show="open" x-transition
+                  class="absolute z-20 mt-1 w-full bg-white border rounded-md shadow-md max-h-60 overflow-y-auto">
+                <template x-for="opt in options" :key="opt.raw">
+                  <div @click="select(opt)"
+                      class="px-4 py-2 cursor-pointer hover:bg-gray-100">
+                    <span x-text="opt.label"></span>
+                  </div>
+                </template>
+              </div>
             </div>
 
-            <!-- FLAT TYPE -->
-            <div class="space-y-2">
+            <!-- FLAT TYPE (Alpine Dropdown) -->
+            <div class="space-y-2" x-data="{
+                open: false,
+                options: ['1 ROOM','2 ROOM','3 ROOM','4 ROOM','5 ROOM','EXECUTIVE', 'MULTI-GENERATION'], selected: '4 ROOM'
+            }">
               <label class="text-base font-medium text-gray-700">Flat Type</label>
-              <select name="flat_type" class="w-full rounded-md border px-4 py-2.5" required>
-                <option>1 ROOM</option>
-                <option>2 ROOM</option>
-                <option>3 ROOM</option>
-                <option>4 ROOM</option>
-                <option>5 ROOM</option>
-                <option>EXECUTIVE</option>
-              </select>
+
+              <!-- Hidden input sent to backend -->
+              <input type="hidden" name="flat_type" x-model="selected">
+
+              <!-- Select box -->
+              <div 
+                class="relative"
+                @click.outside="open = false"
+              >
+                <button 
+                  type="button"
+                  @click="open = !open"
+                  class="w-full flex justify-between items-center rounded-md border px-4 py-2.5 bg-white text-left"
+                >
+                  <span x-text="selected"></span>
+
+                  <!-- Chevron icon -->
+                  <svg xmlns="http://www.w3.org/2000/svg" 
+                      class="h-4 w-4 text-gray-500 transition-transform"
+                      :class="open ? 'rotate-180' : ''"
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <!-- Options -->
+                <ul 
+                  x-show="open" 
+                  x-transition 
+                  class="absolute z-20 mt-1 w-full bg-white border rounded-md shadow-md max-h-60 overflow-y-auto"
+                >
+                  <template x-for="option in options" :key="option">
+                    <li 
+                      @click="selected = option; open = false"
+                      class="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                      x-text="option"
+                    ></li>
+                  </template>
+                </ul>
+              </div>
             </div>
 
             <!-- FLAT MODEL (Precise only) -->
@@ -409,6 +483,94 @@
     {% endif %}
   {% endif %}
 </section>
+
+
+
+
+
+
+
+
+
+<!-- ============================================================
+    ALPINE DROPDOWN SCRIPT FOR TOWN SELECTION
+=============================================================== -->
+<script>
+function hdbTownSelect() {
+  return {
+    open: false,
+    query: "",
+    selected: "",
+    highlighted: 0,
+
+    towns: [
+      "ANG MO KIO", "BEDOK", "BISHAN", "BUKIT BATOK", "BUKIT MERAH", "BUKIT PANJANG",
+      "BUKIT TIMAH", "CHOA CHU KANG", "CLEMENTI", "GEYLANG", "HOUGANG", "JURONG EAST",
+      "JURONG WEST", "KALLANG/WHAMPOA", "MARINE PARADE", "QUEENSTOWN", "SEMBAWANG",
+      "SENGKANG", "SERANGOON", "TAMPINES", "TOA PAYOH", "WOODLANDS", "YISHUN"
+    ],
+
+    get filtered() {
+      const q = this.query.trim().toLowerCase();
+      if (!q) return this.towns;
+      return this.towns.filter(t => t.toLowerCase().includes(q));
+    },
+
+    choose(town) {
+      this.selected = town;
+      this.query = town;
+      this.open = false;
+    },
+
+    highlightNext() {
+      if (this.highlighted < this.filtered.length - 1) this.highlighted++;
+    },
+
+    highlightPrev() {
+      if (this.highlighted > 0) this.highlighted--;
+    },
+
+    selectHighlighted() {
+      if (this.filtered.length > 0) {
+        this.choose(this.filtered[this.highlighted]);
+      }
+    },
+  };
+}
+</script>
+
+
+<!-- ============================================================
+    ALPINE DROPDOWN SCRIPT FOR STOREY SELECTION
+=============================================================== -->
+<script>
+function storeySelect() {
+  return {
+    open: false,
+    selectedLabel: "",
+    selectedRaw: "",
+
+    options: [
+      { label: "01–05", raw: "01 TO 03" },
+      { label: "06–10", raw: "07 TO 09" },
+      { label: "11–15", raw: "13 TO 15" },
+      { label: "16–20", raw: "16 TO 18" },
+      { label: "21–25", raw: "22 TO 24" },
+      { label: "26–30", raw: "28 TO 30" },
+      { label: "31–35", raw: "31 TO 33" },
+      { label: "36–40", raw: "37 TO 39" },
+      { label: "41–45", raw: "43 TO 45" },
+      { label: "46–50", raw: "46 TO 48" }
+    ],
+
+    select(opt) {
+      this.selectedLabel = opt.label;
+      this.selectedRaw = opt.raw;
+      this.open = false;
+    }
+  };
+}
+</script>
 
 
 <!-- ============================================================
