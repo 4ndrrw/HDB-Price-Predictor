@@ -311,27 +311,16 @@
               </div>
             </div>
 
-            <!-- FLAT MODEL (Precise only) -->
-            <div class="space-y-2 precise-only hidden">
-              <label class="text-base font-medium text-gray-700">Flat Model</label>
-              <select name="flat_model" class="w-full rounded-md border px-4 py-2.5" data-precise-required="true">
-                {% for m in ["Improved","New Generation","Model A","Model A2","DBSS","Maisonette",
-                            "Simplified","Standard","Terrace","Premium Apartment","Premium Apartment Loft"] %}
-                  <option>{{ m }}</option>
-                {% endfor %}
-              </select>
-            </div>
-
             <!-- FLOOR AREA -->
             <div class="space-y-2">
-              <label class="text-base font-medium text-gray-700">Floor Area (sqm)</label>
+              <label class="text-base font-medium text-gray-700">Floor Area (m²)</label>
               <input name="floor_area_sqm" type="number" min="20"
                     class="w-full rounded-md border px-4 py-2.5" required />
             </div>
 
             <!-- REMAINING LEASE -->
             <div class="space-y-2">
-              <label class="text-base font-medium text-gray-700">Remaining Lease (years)</label>
+              <label class="text-base font-medium text-gray-700">Remaining Lease (Years)</label>
               <input name="remaining_lease" type="number" min="1"
                     class="w-full rounded-md border px-4 py-2.5" required />
             </div>
@@ -450,10 +439,6 @@
 
               <td class="px-4 py-3">{{ r.floor_area_sqm }}</td>
               <td class="px-4 py-3">{{ r.flat_type }}</td>
-
-              <td class="px-4 py-3">
-                {% if r.mode == "precise" %} {{ r.flat_model }} {% else %} — {% endif %}
-              </td>
 
               <td class="px-4 py-3">
                 {% if r.mode == "precise" %} {{ r.storey_range }} {% else %} — {% endif %}
@@ -614,7 +599,7 @@ function storeySelect() {
 
 {% if user_logged_in %}
 <!-- ============================================================
-     PAGINATION + SORT SCRIPT + CSV EXPORT (ONLY WHEN LOGGED IN)
+    PAGINATION + SORT SCRIPT + CSV EXPORT (ONLY WHEN LOGGED IN)
 =============================================================== -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -785,7 +770,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 <!-- ============================================================
-     FORM REFILL SCRIPT
+    FORM REFILL SCRIPT
 =============================================================== -->
 <script>
 function refillForm(btn) {
@@ -814,5 +799,17 @@ function refillForm(btn) {
 }
 </script>
 
+
+<!-- ============================================================
+    PAGE REFRESH SCRIPT TO CLEAN URL
+=============================================================== -->
+<script>
+  if (window.location.search.length > 0) {
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, "", cleanUrl);
+  }
+</script>
+
+ 
 {% endif %}
 {% endblock %}

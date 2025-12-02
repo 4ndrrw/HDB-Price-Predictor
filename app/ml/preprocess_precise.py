@@ -16,7 +16,6 @@ def prepare_precise_input(form):
     - address
     - storey_range
     - flat_type
-    - flat_model
     - floor_area_sqm
     - remaining_lease
     
@@ -31,7 +30,6 @@ def prepare_precise_input(form):
     address = form["address"].strip().upper()
     storey_range = form["storey_range"]
     flat_type = form["flat_type"]
-    flat_model = form["flat_model"]
     floor_area = float(form["floor_area_sqm"])
     remaining_lease = float(form["remaining_lease"])
 
@@ -54,7 +52,6 @@ def prepare_precise_input(form):
         "street_name": street_name,
         "storey_range": storey_range,
         "flat_type": flat_type,
-        "flat_model": flat_model,
         "floor_area_sqm": floor_area,
         "remaining_lease": remaining_lease,
         "latitude": latitude,

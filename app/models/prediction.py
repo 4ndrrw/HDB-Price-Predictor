@@ -19,10 +19,9 @@ class PredictionHistory:
         db.execute("""
             INSERT INTO predictions
             (mode, town, flat_type, floor_area_sqm, remaining_lease,
-             street_name, storey_range, flat_model, address,
-             latitude, longitude,
+             street_name, storey_range, address, latitude, longitude,
              predicted_price, timestamp, user_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             mode,
             form.get("town"),
@@ -31,7 +30,6 @@ class PredictionHistory:
             form.get("remaining_lease"),
             form.get("street_name"),
             form.get("storey_range"),
-            form.get("flat_model"),
             form.get("address"),
             form.get("latitude"),
             form.get("longitude"),
@@ -67,7 +65,6 @@ class PredictionHistory:
                 "remaining_lease": r["remaining_lease"],
                 "street_name": r["street_name"],
                 "storey_range": r["storey_range"],
-                "flat_model": r["flat_model"],
                 "address": r["address"],
                 "latitude": r["latitude"],
                 "longitude": r["longitude"],

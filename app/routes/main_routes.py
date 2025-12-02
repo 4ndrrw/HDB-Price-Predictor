@@ -60,7 +60,6 @@ def predict():
             required_fields = [
                 "storey_range",
                 "flat_type",
-                "flat_model",
                 "floor_area_sqm",
                 "remaining_lease",
                 "address",

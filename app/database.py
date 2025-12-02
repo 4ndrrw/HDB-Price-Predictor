@@ -51,7 +51,6 @@ CREATE TABLE IF NOT EXISTS predictions (
     -- PRECISE MODE
     street_name TEXT,
     storey_range TEXT,
-    flat_model TEXT,
     address TEXT,
     latitude REAL,
     longitude REAL,
