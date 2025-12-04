@@ -5,7 +5,6 @@ from flask import session
 from app.database import get_db
 
 class PredictionHistory:
-
     @staticmethod
     def save(form, prediction):
 

@@ -37,26 +37,32 @@ def predict():
     # -----------------------------
     if request.method == "POST":
         form = request.form.to_dict()
-
-        # Which model? ("basic" or "precise")
-        mode = form.get("mode", "precise")  # default = precise
+        mode = form.get("mode", "precise")  # default precise
 
         def is_empty(name: str) -> bool:
             val = form.get(name)
             return val is None or str(val).strip() == ""
 
+        # =========================
+        # BASIC MODE
+        # =========================
         if mode == "basic":
-            # BASIC required fields
             required_fields = ["town", "flat_type", "floor_area_sqm", "remaining_lease"]
             if any(is_empty(f) for f in required_fields):
-                # Missing basic fields → redirect with error & keep mode
                 return redirect("/predict?error=missing_basic&mode=basic")
 
             X = prepare_basic_input(form)
             result = basic_model.predict(X)[0]
 
+            # Save only if logged in
+            if user_logged_in:
+                form["mode"] = "basic"
+                PredictionHistory.save(form, result)
+
+        # =========================
+        # PRECISE MODE
+        # =========================
         elif mode == "precise":
-            # PRECISE required fields (NO MORE TOWN & STREET NAME)
             required_fields = [
                 "storey_range",
                 "flat_type",
@@ -64,38 +70,29 @@ def predict():
                 "remaining_lease",
                 "address",
             ]
-
             if any(is_empty(f) for f in required_fields):
                 return redirect("/predict?error=missing_precise&mode=precise")
 
-            # prepare_precise_input() will now parse:
-            # - town (derived from address)
-            # - street_name (derived from address)
-            # - latitude & longitude (lookup)
-            X = prepare_precise_input(form)
+            # prepare_precise_input returns: (X, meta)
+            X, meta = prepare_precise_input(form)
             result = precise_model.predict(X)[0]
 
-        # Store mode so history can differentiate
-        form["mode"] = mode
+            if user_logged_in:
+                meta["mode"] = "precise"
+                PredictionHistory.save(meta, result)
 
-        # Save ONLY if logged in
-        if user_logged_in:
-            PredictionHistory.save(form, result)
-
-        # PRG pattern
+        # -------------------------
+        # Redirect with PRG pattern
+        # -------------------------
         return redirect(f"/predict?temp_result={result}&mode={mode}")
 
     # -----------------------------
-    # GET → Show Form + Optional Result + History
+    # GET → render page
     # -----------------------------
     temp_result = request.args.get("temp_result")
     active_mode = request.args.get("mode", "precise")
 
-    # Load this user's records
-    if user_logged_in:
-        records = PredictionHistory.get_all(user_id)
-    else:
-        records = None
+    records = PredictionHistory.get_all(user_id) if user_logged_in else None
 
     return render_template(
         "predict.html",
