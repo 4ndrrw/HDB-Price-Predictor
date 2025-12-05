@@ -3,19 +3,21 @@
 import pandas as pd
 
 def prepare_basic_input(form_dict):
-    """
-    Prepare input for BASIC pipeline model.
-    Unified field:
-        area = town (basic mode)
-    """
 
-    area = (form_dict.get("town") or "").strip()   # merged area field
+    location = (form_dict.get("town") or "").strip()
 
-    data = {
-        "area": [area],                                # <--- unified location field
-        "flat_type": [(form_dict.get("flat_type") or "").strip()],
-        "floor_area_sqm": [float(form_dict.get("floor_area_sqm") or 0)],
-        "remaining_lease": [float(form_dict.get("remaining_lease") or 0)],
+    X = pd.DataFrame([{
+        "location": location,
+        "flat_type": (form_dict.get("flat_type") or "").strip(),
+        "floor_area_sqm": float(form_dict.get("floor_area_sqm") or 0),
+        "remaining_lease": float(form_dict.get("remaining_lease") or 0),
+    }])
+
+    meta = {
+        "location": location,
+        "flat_type": form_dict.get("flat_type"),
+        "floor_area_sqm": form_dict.get("floor_area_sqm"),
+        "remaining_lease": form_dict.get("remaining_lease"),
     }
 
-    return pd.DataFrame(data)
+    return X, meta

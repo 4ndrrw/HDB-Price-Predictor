@@ -14,24 +14,19 @@ class PredictionHistory:
 
         mode = form.get("mode", "precise")
 
-        # Unified location field
-        # Basic mode → town
-        # Precise mode → street_name (from OneMap)
-        if mode == "basic":
-            area = form.get("town")  # comes from dropdown
-        else:
-            area = form.get("street_name")  # from OneMap API
+        # location stored in DB
+        location = form.get("location") or form.get("address") or form.get("town")
 
         db = get_db()
         db.execute("""
             INSERT INTO predictions
-            (mode, area, flat_type, floor_area_sqm, remaining_lease,
+            (mode, location, flat_type, floor_area_sqm, remaining_lease,
              storey_range, address, latitude, longitude,
              predicted_price, timestamp, user_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             mode,
-            area,
+            location,
             form.get("flat_type"),
             form.get("floor_area_sqm"),
             form.get("remaining_lease"),
@@ -48,7 +43,6 @@ class PredictionHistory:
 
     @staticmethod
     def get_all(user_id):
-
         if not user_id:
             return []
 
@@ -60,20 +54,16 @@ class PredictionHistory:
             ORDER BY id DESC
         """, (user_id,)).fetchall()
 
-        results = []
-        for r in rows:
-            results.append({
-                "id": r["id"],
-                "mode": r["mode"],
-                "area": r["area"],           # <-- unified field
-                "flat_type": r["flat_type"],
-                "floor_area_sqm": r["floor_area_sqm"],
-                "remaining_lease": r["remaining_lease"],
-                "storey_range": r["storey_range"],
-                "address": r["address"],
-                "latitude": r["latitude"],
-                "longitude": r["longitude"],
-                "predicted_price": r["predicted_price"],
-            })
-
-        return results
+        return [{
+            "id": r["id"],
+            "mode": r["mode"],
+            "location": r["location"],
+            "flat_type": r["flat_type"],
+            "floor_area_sqm": r["floor_area_sqm"],
+            "remaining_lease": r["remaining_lease"],
+            "storey_range": r["storey_range"],
+            "address": r["address"],
+            "latitude": r["latitude"],
+            "longitude": r["longitude"],
+            "predicted_price": r["predicted_price"],
+        } for r in rows]

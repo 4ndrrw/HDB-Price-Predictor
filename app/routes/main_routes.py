@@ -46,20 +46,18 @@ def predict():
         # =========================
         # BASIC MODE
         # =========================
+        # BASIC MODE
         if mode == "basic":
             required_fields = ["town", "flat_type", "floor_area_sqm", "remaining_lease"]
             if any(is_empty(f) for f in required_fields):
                 return redirect("/predict?error=missing_basic&mode=basic")
 
-            # Prepare model input
-            X = prepare_basic_input(form)
+            X, meta = prepare_basic_input(form)   # <-- FIX HERE
             result = basic_model.predict(X)[0]
 
-            # Prepare metadata for DB
             if user_logged_in:
-                form["mode"] = "basic"
-                form["area"] = form.get("town")  # NEW unified field
-                PredictionHistory.save(form, result)
+                meta["mode"] = "basic"
+                PredictionHistory.save(meta, result)
 
         # =========================
         # PRECISE MODE
@@ -81,6 +79,7 @@ def predict():
 
             if user_logged_in:
                 meta["mode"] = "precise"
+                
                 # meta already contains -> area, address, latitude, longitude
                 PredictionHistory.save(meta, result)
 

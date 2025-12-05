@@ -387,7 +387,7 @@
           <div class="rounded-xl border bg-gray-50 p-6">
             <p class="text-base">Estimated property price</p>
             <p class="text-4xl font-bold mt-2">
-              {{ "${:,.2f}".format(result|float).replace(',', '    ') }}
+              {{ "${:,.2f}".format(result|float) }}
             </p>
             <p class="text-sm text-gray-500 mt-1">Generated just now</p>
           </div>
@@ -411,24 +411,22 @@
     <!-- TITLE + BUTTONS IN SAME ROW -->
     <div class="flex items-center justify-between">
 
-      <!-- LEFT — TITLES -->
       <div>
         <p class="text-lg font-semibold text-gray-700">Prediction history</p>
         <p class="text-lg text-gray-600">Your past HDB valuations.</p>
       </div>
 
-      <!-- RIGHT — BUTTONS -->
       {% if records and records|length > 0 %}
       <div class="flex items-center gap-4">
 
-        <!-- CSV EXPORT BUTTON -->
+        <!-- CSV EXPORT -->
         <button id="downloadCsv"
           class="px-5 py-3 rounded-md border border-gray-300 text-base font-medium text-gray-800
                  hover:bg-gray-100 hover:-translate-y-0.5 active:scale-[0.97] transition">
           Download CSV
         </button>
 
-        <!-- CLEAR HISTORY BUTTON -->
+        <!-- CLEAR HISTORY -->
         <a href="/clear_history"
           class="px-5 py-3 rounded-md text-base font-medium
                  bg-black text-white border border-transparent
@@ -439,22 +437,18 @@
 
       </div>
       {% endif %}
-
     </div>
-
 
     <!-- TABLE + PAGINATION -->
     {% if records and records|length > 0 %}
 
-      <!-- TABLE WRAPPER -->
       <div class="overflow-x-auto mt-6">
         <table class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
 
           <!-- HEADER -->
           <thead class="bg-gray-200 text-gray-700 text-sm">
             <tr>
-              <th class="px-4 py-3 text-left">Town</th>
-              <th class="px-4 py-3 text-left">Street</th>
+              <th class="px-4 py-3 text-left">Location</th>         <!-- area -->
               <th class="px-4 py-3 text-left">Area (sqm)</th>
               <th class="px-4 py-3 text-left">Flat Type</th>
               <th class="px-4 py-3 text-left">Storey</th>
@@ -648,7 +642,7 @@ function storeySelect() {
 
 
 <!-- ============================================================
-    PAGINATION + SORT SCRIPT + CSV EXPORT (ONLY WHEN LOGGED IN)
+    HISTORY TABLE SCRIPT WITH PAGINATION + CSV EXPORT
 =============================================================== -->
 {% if user_logged_in %}
 <script>
@@ -660,11 +654,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let rows = [
     {% for r in records %}
       {
-        town: "{{ r.town }}",
-        street: "{{ r.street_name if r.street_name else '' }}",
-        area: "{{ r.floor_area_sqm }}",
+        location: "{{ r.location }}",      // <-- unified final field
+        area_sqm: "{{ r.floor_area_sqm }}",
         flat_type: "{{ r.flat_type }}",
-        storey: "{{ r.storey_range if r.mode == 'precise' else '' }}",
+        storey: "{{ r.storey_range if r.mode == 'precise' else '—' }}",
         lease: "{{ r.remaining_lease }}",
         mode: "{{ r.mode }}",
         price_raw: {{ r.predicted_price if r.predicted_price is not none else "null" }},
@@ -679,9 +672,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const rowsPerPage = 8;
   let currentPage = 1;
 
-  // ------------------------------------------
-  // DOM ELEMENTS
-  // ------------------------------------------
   const tableBody = document.getElementById("historyBody");
   const prevBtn   = document.getElementById("prevPage");
   const nextBtn   = document.getElementById("nextPage");
@@ -700,11 +690,10 @@ document.addEventListener("DOMContentLoaded", () => {
     items.forEach(r => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td class="px-4 py-3">${r.town}</td>
-        <td class="px-4 py-3">${r.street || "—"}</td>
-        <td class="px-4 py-3">${r.area}</td>
+        <td class="px-4 py-3">${r.location}</td>
+        <td class="px-4 py-3">${r.area_sqm}</td>
         <td class="px-4 py-3">${r.flat_type}</td>
-        <td class="px-4 py-3">${r.storey || "—"}</td>
+        <td class="px-4 py-3">${r.storey}</td>
         <td class="px-4 py-3">${r.lease}</td>
         <td class="px-4 py-3">
           ${r.mode === "precise"
@@ -720,7 +709,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ------------------------------------------
-  // PAGINATION BUTTON STATE
+  // PAGINATION
   // ------------------------------------------
   function updatePaginationControls() {
     const totalPages = Math.ceil(rows.length / rowsPerPage);
@@ -743,9 +732,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // CSV EXPORT
   // ------------------------------------------
   downloadBtn.addEventListener("click", () => {
-    let csv = "Town,Street,Area,Flat Type,Storey,Lease,Mode,Price\n";
+    let csv = "Location,Area_sqm,Flat Type,Storey,Lease,Mode,Price\n";
     rows.forEach(r => {
-      csv += `${r.town},${r.street},${r.area},${r.flat_type},${r.storey},${r.lease},${r.mode},${r.price_raw}\n`;
+      csv += `${r.location},${r.area_sqm},${r.flat_type},${r.storey},${r.lease},${r.mode},${r.price_raw}\n`;
     });
 
     const blob = new Blob([csv], { type: "text/csv" });
@@ -763,41 +752,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // INITIAL RENDER
   // ------------------------------------------
   renderTable();
-
 });
 </script>
 {% endif %}
-
-
-<!-- ============================================================
-    FORM REFILL SCRIPT
-=============================================================== -->
-<script>
-function refillForm(btn) {
-
-  // BASIC FIELDS
-  document.getElementById("field_property_type").value = btn.dataset.prop;
-  document.getElementById("field_bedrooms").value      = btn.dataset.bed;
-  document.getElementById("field_bathrooms").value     = btn.dataset.bath;
-  document.getElementById("field_size").value          = btn.dataset.size;
-  document.getElementById("field_postcode").value      = btn.dataset.post;
-
-  // AREA FIELD
-  const areaSearch   = document.getElementById("field_area_search");
-  const areaSelected = document.getElementById("field_area_hidden");
-
-  if (areaSearch && areaSelected) {
-    areaSearch.value   = btn.dataset.area;
-    areaSelected.value = btn.dataset.area;
-
-    // Trigger Alpine filtering
-    areaSearch.dispatchEvent(new Event("input"));
-  }
-
-  // Scroll back to form
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-</script>
 
 
 <!-- ============================================================

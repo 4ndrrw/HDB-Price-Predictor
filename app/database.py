@@ -35,32 +35,25 @@ ON users(username);
         # -----------------------------
         # 2. Create prediction history
         # -----------------------------
+
         db.execute("""
-CREATE TABLE IF NOT EXISTS predictions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+        CREATE TABLE IF NOT EXISTS predictions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            mode TEXT,
+            location TEXT,             -- unified
+            flat_type TEXT,
+            floor_area_sqm REAL,
+            remaining_lease REAL,
+            storey_range TEXT,
+            address TEXT,
+            latitude REAL,
+            longitude REAL,
+            predicted_price REAL,
+            timestamp TEXT,
+            user_id INTEGER
+        );
+        """)
 
-    -- COMMON
-    mode TEXT,
-
-    -- UNIFIED LOCATION FIELD
-    area TEXT,                  -- <--- NEW (replaces town + street_name)
-
-    -- SHARED FIELDS
-    flat_type TEXT,
-    floor_area_sqm REAL,
-    remaining_lease REAL,
-
-    -- PRECISE MODE FIELDS
-    storey_range TEXT,
-    address TEXT,
-    latitude REAL,
-    longitude REAL,
-
-    predicted_price REAL,
-    timestamp TEXT,
-    user_id INTEGER
-);
-""")
 
         db.execute("""
 CREATE INDEX IF NOT EXISTS idx_predictions_timestamp
