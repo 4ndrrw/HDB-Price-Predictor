@@ -6,47 +6,31 @@ from app.database import get_db
 
 class PredictionHistory:
     @staticmethod
-    def save(form, prediction):
+    def save(meta, prediction):
 
         user_id = session.get("user_id")
         if user_id is None:
             return
 
-        mode = form.get("mode", "precise")
-
-        # unified location field
-        location = (
-            form.get("location")
-            or form.get("address")
-            or form.get("town")
-        )
-
-        # compute price per sqm
-        try:
-            area = float(form.get("floor_area_sqm"))
-            price_per_sqm = float(prediction) / area if area > 0 else None
-        except:
-            price_per_sqm = None
-
         db = get_db()
         db.execute("""
             INSERT INTO predictions
             (mode, location, flat_type, floor_area_sqm, remaining_lease,
-             storey_range, address, latitude, longitude,
-             predicted_price, price_per_sqm, timestamp, user_id)
+            storey_range, address, latitude, longitude,
+            predicted_price, price_per_sqm, timestamp, user_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            mode,
-            location,
-            form.get("flat_type"),
-            form.get("floor_area_sqm"),
-            form.get("remaining_lease"),
-            form.get("storey_range"),
-            form.get("address"),
-            form.get("latitude"),
-            form.get("longitude"),
+            meta.get("mode"),
+            meta.get("location"),
+            meta.get("flat_type"),
+            meta.get("floor_area_sqm"),
+            meta.get("remaining_lease"),
+            meta.get("storey_range"),
+            meta.get("address"),
+            meta.get("latitude"),
+            meta.get("longitude"),
             float(prediction),
-            price_per_sqm,
+            float(meta.get("price_per_sqm")) if meta.get("price_per_sqm") is not None else None,
             datetime.now().isoformat(),
             user_id
         ))
