@@ -424,60 +424,63 @@
             <div class="mt-6">
               <p class="text-base font-semibold text-gray-800 mb-2">Key Insights</p>
               <ul class="list-disc ml-5 text-sm text-gray-600 space-y-1">
-                <li>This valuation is consistent with typical prices in the area.</li>
-                <li>Remaining lease is within the healthy range for financing.</li>
-                <li>4-room units maintain stable demand across most towns.</li>
+                <li>{{ insights[0] }}</li>
+                <li>{{ insights[1] }}</li>
+                <li>{{ insights[2] }}</li>
               </ul>
             </div>
-            </div>
-            <!-- PRO TIPS CAROUSEL -->
-            <div 
-              x-data="{
-                index: 0,
-                tips: [
-                  'Higher-floor units often command stronger resale premiums.',
-                  'Well-renovated units can influence valuations by 8–12%.',
-                  'Corner units have better privacy and may enjoy higher demand.',
-                  'Lease remaining above 70 years keeps financing options flexible.',
-                  'Good natural light and orientation can add meaningful value.'
-                ]
-              }"
-              class="mt-8 border rounded-lg bg-white/70 backdrop-blur p-5 shadow-sm"
-            >
-              <p class="text-base font-semibold text-gray-800 mb-3">Pro Tips</p>
+          </div>  
+        {% else %}
+          <div class="rounded-xl h-24 bg-gray-100 animate-pulse"></div>
+        {% endif %}
 
-              <!-- Tip Text -->
-              <p class="text-sm text-gray-700 min-h-[48px] leading-relaxed">
-                <span x-text="tips[index]"></span>
-              </p>
+        <!-- ============================
+            PRO TIPS (OUTSIDE PRICE CARD)
+        =============================== -->
+        {% if result %}
+          <div 
+            x-data="{
+              index: 0,
+              tips: [
+                'Higher-floor units often command stronger resale premiums.',
+                'Well-renovated units can influence valuations by 8–12%.',
+                'Corner units have better privacy and may enjoy higher demand.',
+                'Lease remaining above 70 years keeps financing options flexible.',
+                'Good natural light and orientation can add meaningful value.'
+              ]
+            }"
+            class="mt-8 border rounded-lg bg-white/70 backdrop-blur p-5 shadow-sm"
+          >
+            <p class="text-base font-semibold text-gray-800 mb-3">Pro Tips</p>
 
-              <!-- Controls -->
-              <div class="flex justify-between items-center mt-4">
-                <button 
-                  @click="index = (index === 0) ? tips.length - 1 : index - 1"
-                  class="px-3 py-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-100 text-sm transition"
-                >
-                  ◀ Previous
-                </button>
+            <p class="text-sm text-gray-700 min-h-[48px] leading-relaxed">
+              <span x-text="tips[index]"></span>
+            </p>
 
-                <!-- Dots -->
-                <div class="flex gap-1.5">
-                  <template x-for="(t, i) in tips" :key="i">
-                    <div 
-                      class="w-2.5 h-2.5 rounded-full"
-                      :class="index === i ? 'bg-gray-800' : 'bg-gray-300'"
-                    ></div>
-                  </template>
-                </div>
+            <div class="flex justify-between items-center mt-4">
+              <button 
+                @click="index = (index === 0) ? tips.length - 1 : index - 1"
+                class="px-3 py-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-100 text-sm transition"
+              >
+                ◀ Previous
+              </button>
 
-                <button 
-                  @click="index = (index === tips.length - 1) ? 0 : index + 1"
-                  class="px-3 py-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-100 text-sm transition"
-                >
-                  Next ▶
-                </button>
+              <div class="flex gap-1.5">
+                <template x-for="(t, i) in tips" :key="i">
+                  <div 
+                    class="w-2.5 h-2.5 rounded-full"
+                    :class="index === i ? 'bg-gray-800' : 'bg-gray-300'"
+                  ></div>
+                </template>
               </div>
 
+              <button 
+                @click="index = (index === tips.length - 1) ? 0 : index + 1"
+                class="px-3 py-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-100 text-sm transition"
+              >
+                Next ▶
+              </button>
+            </div>
           </div>
         {% else %}
           <div class="rounded-xl h-24 bg-gray-100 animate-pulse"></div>
