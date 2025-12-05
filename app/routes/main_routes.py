@@ -37,55 +37,66 @@ def predict():
     # -----------------------------
     if request.method == "POST":
         form = request.form.to_dict()
-        mode = form.get("mode", "precise")  # default precise
+        mode = form.get("mode", "precise")
 
         def is_empty(name: str) -> bool:
-            val = form.get(name)
-            return val is None or str(val).strip() == ""
+            v = form.get(name)
+            return v is None or str(v).strip() == ""
 
-        # =========================
+        # =====================================================
         # BASIC MODE
-        # =========================
-        # BASIC MODE
+        # =====================================================
         if mode == "basic":
-            required_fields = ["town", "flat_type", "floor_area_sqm", "remaining_lease"]
-            if any(is_empty(f) for f in required_fields):
+            required = ["town", "flat_type", "floor_area_sqm", "remaining_lease"]
+            if any(is_empty(f) for f in required):
                 return redirect("/predict?error=missing_basic&mode=basic")
 
-            X, meta = prepare_basic_input(form)   # <-- FIX HERE
+            # prepare_basic_input RETURNS ONLY X
+            X = prepare_basic_input(form)
+
+            # Build DB metadata manually
+            meta = {
+                "mode": "basic",
+                "location": form.get("town"),  # unified field
+                "flat_type": form.get("flat_type"),
+                "floor_area_sqm": form.get("floor_area_sqm"),
+                "remaining_lease": form.get("remaining_lease"),
+                "storey_range": None,
+                "address": None,
+                "latitude": None,
+                "longitude": None,
+            }
+
+            # Run prediction
             result = basic_model.predict(X)[0]
 
+            # Save to history
             if user_logged_in:
-                meta["mode"] = "basic"
                 PredictionHistory.save(meta, result)
 
-        # =========================
+        # =====================================================
         # PRECISE MODE
-        # =========================
+        # =====================================================
         elif mode == "precise":
-            required_fields = [
-                "storey_range",
-                "flat_type",
-                "floor_area_sqm",
-                "remaining_lease",
-                "address",
-            ]
-            if any(is_empty(f) for f in required_fields):
+            required = ["storey_range", "flat_type", "floor_area_sqm", "remaining_lease", "address"]
+            if any(is_empty(f) for f in required):
                 return redirect("/predict?error=missing_precise&mode=precise")
 
-            # prepare_precise_input returns: (X, meta)
+            # Prepare precise input
             X, meta = prepare_precise_input(form)
+
+            # ❌ INVALID ADDRESS — STOP
+            if X is None and meta == "invalid":
+                return redirect("/predict?error=invalid_address&mode=precise")
+
+            # Run prediction
             result = precise_model.predict(X)[0]
 
             if user_logged_in:
                 meta["mode"] = "precise"
-                
-                # meta already contains -> area, address, latitude, longitude
                 PredictionHistory.save(meta, result)
 
-        # -------------------------
-        # Redirect with PRG pattern
-        # -------------------------
+        # After prediction → redirect (PRG)
         return redirect(f"/predict?temp_result={result}&mode={mode}")
 
     # -----------------------------
@@ -106,7 +117,7 @@ def predict():
 
 
 # -----------------------------
-# Clear History (per-user)
+# Clear History
 # -----------------------------
 @main_bp.route("/clear_history")
 def clear_history():

@@ -165,11 +165,19 @@
             <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               Please fill in all required fields.
             </div>
+
           {% elif error == "missing_precise" %}
             <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               Please fill in all required fields.
             </div>
+
+          {% elif error == "invalid_address" %}
+            <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              Invalid address — please enter a valid Singapore address.
+            </div>
+
           {% endif %}
+
         </div>
 
 
@@ -526,10 +534,10 @@ function hdbTownSelect() {
     highlighted: 0,
 
     towns: [
-      "ANG MO KIO", "BEDOK", "BISHAN", "BUKIT BATOK", "BUKIT MERAH", "BUKIT PANJANG",
-      "BUKIT TIMAH", "CHOA CHU KANG", "CLEMENTI", "GEYLANG", "HOUGANG", "JURONG EAST",
-      "JURONG WEST", "KALLANG/WHAMPOA", "MARINE PARADE", "QUEENSTOWN", "SEMBAWANG",
-      "SENGKANG", "SERANGOON", "TAMPINES", "TOA PAYOH", "WOODLANDS", "YISHUN"
+      "Ang Mo Kio", "Bedok", "Bishan", "Bukit Batok", "Bukit Merah", "Bukit Panjang",
+      "Bukit Timah", "Choa Chu Kang", "Clementi", "Geylang", "Hougang", "Jurong East",
+      "Jurong West", "Kallang/Whampoa", "Marine Parade", "Queenstown", "Sembawang",
+      "Sengkang", "Serangoon", "Tampines", "Toa Payoh", "Woodlands", "Yishun"
     ],
 
     get filtered() {
