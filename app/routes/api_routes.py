@@ -13,35 +13,36 @@ precise_model = joblib.load("app/ml/rf_model_precise.pkl")
 
 @api_bp.route("/predict", methods=["POST"])
 def api_predict():
-    """
-    JSON API endpoint for predictions.
-    Expected JSON body:
-    {
-        "mode": "basic" or "precise",
-        ... other HDB fields ...
-    }
-    """
-
     data = request.json or {}
     mode = data.get("mode", "precise")
 
-    # Choose preprocessing & model
+    # Validate required fields
     if mode == "basic":
-        X = prepare_basic_input(data)
+        required = ["town", "flat_type", "floor_area_sqm", "remaining_lease"]
+    else:
+        required = ["storey_range", "flat_type", "floor_area_sqm", "remaining_lease", "address"]
+
+    for field in required:
+        if field not in data:
+            return jsonify({"error": f"Missing field: {field}"}), 400
+
+    # Choose model + preprocessing (CORRECTED unpack)
+    if mode == "basic":
+        X, meta = prepare_basic_input(data)
         model = basic_model
     else:
-        X = prepare_precise_input(data)
+        X, meta = prepare_precise_input(data)
         model = precise_model
 
     # Predict
     prediction = float(model.predict(X)[0])
 
-    # Save if user is logged in
+    # Save prediction history (if logged in)
     user_id = session.get("user_id")
     if user_id:
         PredictionHistory.save(data, prediction)
 
-    return jsonify({"prediction": prediction, "mode": mode})
+    return jsonify({"prediction": prediction, "mode": mode}), 200
 
 
 @api_bp.route("/history")

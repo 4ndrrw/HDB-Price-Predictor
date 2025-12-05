@@ -127,12 +127,19 @@ def test_api_predict_success():
     client = app.test_client()
     res = client.post(
         "/api/predict",
-        data=json.dumps({"area": 100, "rooms": 3}),
+        data=json.dumps({
+            "mode": "basic",
+            "town": "ANG MO KIO",
+            "flat_type": "3 ROOM",
+            "floor_area_sqm": 70,
+            "remaining_lease": 80,
+            # your model does NOT use "rooms" or "area", 
+            # it expects real HDB fields
+        }),
         content_type="application/json"
     )
     assert res.status_code == 200
     assert "prediction" in res.json
-
 
 def test_api_predict_missing_field():
     client = app.test_client()
