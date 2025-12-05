@@ -51,7 +51,6 @@ def predict():
             if any(is_empty(f) for f in required):
                 return redirect("/predict?error=missing_basic&mode=basic")
 
-            # ---- Validate ranges ----
             area = float(form.get("floor_area_sqm"))
             lease = float(form.get("remaining_lease"))
 
@@ -61,14 +60,14 @@ def predict():
             if not (55 <= lease <= 99):
                 return redirect("/predict?error=invalid_lease&mode=basic")
 
-            # prepare_basic_input returns (X, meta)
             X, meta = prepare_basic_input(form)
-
             result = basic_model.predict(X)[0]
 
             if user_logged_in:
                 meta["mode"] = "basic"
                 PredictionHistory.save(meta, result)
+
+            return redirect(f"/predict?temp_result={result}&mode=basic")
 
         # =====================================================
         # PRECISE MODE
@@ -80,7 +79,6 @@ def predict():
             if any(is_empty(f) for f in required):
                 return redirect("/predict?error=missing_precise&mode=precise")
 
-            # ---- Validate ranges ----
             area = float(form.get("floor_area_sqm"))
             lease = float(form.get("remaining_lease"))
 
@@ -90,10 +88,8 @@ def predict():
             if not (55 <= lease <= 99):
                 return redirect("/predict?error=invalid_lease&mode=precise")
 
-            # Prepare precise input
             X, meta = prepare_precise_input(form)
 
-            # Invalid address caught via preprocess
             if X is None and meta == "invalid":
                 return redirect("/predict?error=invalid_address&mode=precise")
 
@@ -102,6 +98,9 @@ def predict():
             if user_logged_in:
                 meta["mode"] = "precise"
                 PredictionHistory.save(meta, result)
+
+            return redirect(f"/predict?temp_result={result}&mode=precise")
+
 
     # -----------------------------
     # GET → render page
