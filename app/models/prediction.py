@@ -14,16 +14,27 @@ class PredictionHistory:
 
         mode = form.get("mode", "precise")
 
-        # location stored in DB
-        location = form.get("location") or form.get("address") or form.get("town")
+        # unified location field
+        location = (
+            form.get("location")
+            or form.get("address")
+            or form.get("town")
+        )
+
+        # compute price per sqm
+        try:
+            area = float(form.get("floor_area_sqm"))
+            price_per_sqm = float(prediction) / area if area > 0 else None
+        except:
+            price_per_sqm = None
 
         db = get_db()
         db.execute("""
             INSERT INTO predictions
             (mode, location, flat_type, floor_area_sqm, remaining_lease,
              storey_range, address, latitude, longitude,
-             predicted_price, timestamp, user_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             predicted_price, price_per_sqm, timestamp, user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             mode,
             location,
@@ -35,6 +46,7 @@ class PredictionHistory:
             form.get("latitude"),
             form.get("longitude"),
             float(prediction),
+            price_per_sqm,
             datetime.now().isoformat(),
             user_id
         ))
@@ -66,4 +78,5 @@ class PredictionHistory:
             "latitude": r["latitude"],
             "longitude": r["longitude"],
             "predicted_price": r["predicted_price"],
+            "price_per_sqm": r["price_per_sqm"],   # NEW FIELD
         } for r in rows]

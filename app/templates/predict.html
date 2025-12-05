@@ -395,7 +395,7 @@
           </p>
 
           {% if result %}
-            <p class="text-2xl font-semibold text-gray-900">Estimated price</p>
+            <p class="text-2xl font-semibold text-gray-900">Estimated Valuation</p>
           {% else %}
             <p class="text-2xl font-semibold text-gray-900">Your valuation will appear here</p>
           {% endif %}
@@ -404,10 +404,21 @@
         {% if result %}
           <div class="rounded-xl border bg-gray-50 p-6">
             <p class="text-base">Estimated property price</p>
+
+            <!-- MAIN PRICE -->
             <p class="text-4xl font-bold mt-2">
               {{ "${:,.2f}".format(result|float) }}
             </p>
-            <p class="text-sm text-gray-500 mt-1">Generated just now</p>
+
+            <!-- PRICE PER SQM -->
+            {% if request.args.get("ppsqm") %}
+              <p class="text-sm text-gray-600 mt-3">
+                Price per sqm:
+                <span class="font-semibold text-gray-900">
+                  {{ "${:,.0f}".format(request.args.get("ppsqm")|float) }}
+                </span>
+              </p>
+            {% endif %}
           </div>
         {% else %}
           <div class="rounded-xl h-24 bg-gray-100 animate-pulse"></div>
@@ -430,8 +441,8 @@
     <div class="flex items-center justify-between">
 
       <div>
-        <p class="text-lg font-semibold text-gray-700">Prediction history</p>
-        <p class="text-lg text-gray-600">Your past HDB valuations.</p>
+        <p class="text-lg font-semibold text-gray-700">Prediction History</p>
+        <p class="text-lg text-gray-600">Your Past HDB Valuations.</p>
       </div>
 
       {% if records and records|length > 0 %}
@@ -450,7 +461,7 @@
                  bg-black text-white border border-transparent
                  hover:bg-gray-900 hover:-translate-y-0.5
                  active:scale-[0.97] transition">
-          Clear history
+          Clear History
         </a>
 
       </div>
@@ -473,6 +484,7 @@
               <th class="px-4 py-3 text-left">Lease (yrs)</th>
               <th class="px-4 py-3 text-left">Mode</th>
               <th class="px-4 py-3 text-left">Price</th>
+              <th class="px-4 py-3 text-left">Price per sqm</th>
             </tr>
           </thead>
 
@@ -668,14 +680,16 @@
       let rows = [
         {% for r in records %}
           {
-            location: "{{ r.location }}",      // <-- unified final field
+            location: "{{ r.location }}",
             area_sqm: "{{ r.floor_area_sqm }}",
             flat_type: "{{ r.flat_type }}",
             storey: "{{ r.storey_range if r.mode == 'precise' else '—' }}",
             lease: "{{ r.remaining_lease }}",
             mode: "{{ r.mode }}",
             price_raw: {{ r.predicted_price if r.predicted_price is not none else "null" }},
-            price_display: "{{ '${:,.0f}'.format(r.predicted_price|float) if r.predicted_price else '—' }}"
+            price_display: "{{ '${:,.0f}'.format(r.predicted_price|float) if r.predicted_price else '—' }}",
+            ppsqm_raw: {{ r.price_per_sqm if r.price_per_sqm is not none else "null" }},
+            ppsqm_display: "{{ '${:,.0f}'.format(r.price_per_sqm|float) if r.price_per_sqm else '—' }}"
           },
         {% endfor %}
       ];
@@ -715,6 +729,7 @@
                 : '<span class="px-2 py-1 text-xs bg-gray-700 text-white rounded">Basic</span>'}
             </td>
             <td class="px-4 py-3 font-semibold">${r.price_display}</td>
+            <td class="px-4 py-3 font-semibold">${r.ppsqm_display}</td>
           `;
           tableBody.appendChild(tr);
         });
@@ -746,9 +761,9 @@
       // CSV EXPORT
       // ------------------------------------------
       downloadBtn.addEventListener("click", () => {
-        let csv = "Location,Area_sqm,Flat Type,Storey,Lease,Mode,Price\n";
+        let csv = "Location,Area_sqm,Flat Type,Storey,Lease,Mode,Price,Price_per_sqm\n";
         rows.forEach(r => {
-          csv += `${r.location},${r.area_sqm},${r.flat_type},${r.storey},${r.lease},${r.mode},${r.price_raw}\n`;
+          csv += `${r.location},${r.area_sqm},${r.flat_type},${r.storey},${r.lease},${r.mode},${r.price_raw},${r.ppsqm_raw}\n`;
         });
 
         const blob = new Blob([csv], { type: "text/csv" });

@@ -49,11 +49,11 @@ ON users(username);
             latitude REAL,
             longitude REAL,
             predicted_price REAL,
+            price_per_sqm REAL,        -- NEW COLUMN
             timestamp TEXT,
             user_id INTEGER
         );
         """)
-
 
         db.execute("""
 CREATE INDEX IF NOT EXISTS idx_predictions_timestamp

@@ -63,11 +63,17 @@ def predict():
             X, meta = prepare_basic_input(form)
             result = basic_model.predict(X)[0]
 
+            # compute price per sqm
+            price_per_sqm = result / area
+
             if user_logged_in:
                 meta["mode"] = "basic"
+                meta["price_per_sqm"] = price_per_sqm
                 PredictionHistory.save(meta, result)
 
-            return redirect(f"/predict?temp_result={result}&mode=basic")
+            return redirect(
+                f"/predict?temp_result={result}&ppsqm={price_per_sqm}&mode=basic"
+            )
 
         # =====================================================
         # PRECISE MODE
@@ -95,12 +101,16 @@ def predict():
 
             result = precise_model.predict(X)[0]
 
+            price_per_sqm = result / area
+
             if user_logged_in:
                 meta["mode"] = "precise"
+                meta["price_per_sqm"] = price_per_sqm
                 PredictionHistory.save(meta, result)
 
-            return redirect(f"/predict?temp_result={result}&mode=precise")
-
+            return redirect(
+                f"/predict?temp_result={result}&ppsqm={price_per_sqm}&mode=precise"
+            )
 
     # -----------------------------
     # GET → render page
@@ -116,6 +126,7 @@ def predict():
         records=records,
         user_logged_in=user_logged_in,
         active_mode=active_mode,
+        ppsqm=request.args.get("ppsqm"),
     )
 
 
