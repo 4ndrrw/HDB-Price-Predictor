@@ -51,12 +51,14 @@ def predict():
             if any(is_empty(f) for f in required_fields):
                 return redirect("/predict?error=missing_basic&mode=basic")
 
+            # Prepare model input
             X = prepare_basic_input(form)
             result = basic_model.predict(X)[0]
 
-            # Save only if logged in
+            # Prepare metadata for DB
             if user_logged_in:
                 form["mode"] = "basic"
+                form["area"] = form.get("town")  # NEW unified field
                 PredictionHistory.save(form, result)
 
         # =========================
@@ -79,6 +81,7 @@ def predict():
 
             if user_logged_in:
                 meta["mode"] = "precise"
+                # meta already contains -> area, address, latitude, longitude
                 PredictionHistory.save(meta, result)
 
         # -------------------------
@@ -111,7 +114,6 @@ def clear_history():
 
     user_id = session.get("user_id")
 
-    # Must be logged in
     if not user_id:
         return redirect("/login")
 

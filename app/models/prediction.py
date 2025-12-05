@@ -14,20 +14,27 @@ class PredictionHistory:
 
         mode = form.get("mode", "precise")
 
+        # Unified location field
+        # Basic mode → town
+        # Precise mode → street_name (from OneMap)
+        if mode == "basic":
+            area = form.get("town")  # comes from dropdown
+        else:
+            area = form.get("street_name")  # from OneMap API
+
         db = get_db()
         db.execute("""
             INSERT INTO predictions
-            (mode, town, flat_type, floor_area_sqm, remaining_lease,
-             street_name, storey_range, address, latitude, longitude,
+            (mode, area, flat_type, floor_area_sqm, remaining_lease,
+             storey_range, address, latitude, longitude,
              predicted_price, timestamp, user_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             mode,
-            form.get("town"),
+            area,
             form.get("flat_type"),
             form.get("floor_area_sqm"),
             form.get("remaining_lease"),
-            form.get("street_name"),
             form.get("storey_range"),
             form.get("address"),
             form.get("latitude"),
@@ -58,11 +65,10 @@ class PredictionHistory:
             results.append({
                 "id": r["id"],
                 "mode": r["mode"],
-                "town": r["town"],
+                "area": r["area"],           # <-- unified field
                 "flat_type": r["flat_type"],
                 "floor_area_sqm": r["floor_area_sqm"],
                 "remaining_lease": r["remaining_lease"],
-                "street_name": r["street_name"],
                 "storey_range": r["storey_range"],
                 "address": r["address"],
                 "latitude": r["latitude"],

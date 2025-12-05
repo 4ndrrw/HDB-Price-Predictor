@@ -1,18 +1,43 @@
-import pandas as pd
+import requests
 
-# Load geocoded CSV once globally
-df = pd.read_csv("app/ml/data/Flat prices geocoded.csv")
+BASE_URL = "https://developers.onemap.sg/commonapi/search"
 
-# Build fast dictionary lookup
-ADDRESS_TO_LAT = dict(zip(df["address"].str.upper(), df["latitude"]))
-ADDRESS_TO_LON = dict(zip(df["address"].str.upper(), df["longitude"]))
-
-def get_lat_lon(address: str):
+def get_address_details(address: str):
+    """
+    Calls OneMap API to retrieve latitude, longitude, block, road name, building, postal code, etc.
+    Returns a dictionary with extracted fields or None if failed.
+    """
     if not address:
-        return None, None
+        return None
 
-    key = address.upper().strip()
-    lat = ADDRESS_TO_LAT.get(key)
-    lon = ADDRESS_TO_LON.get(key)
+    params = {
+        "searchVal": address,
+        "returnGeom": "Y",
+        "getAddrDetails": "Y",
+        "pageNum": 1
+    }
 
-    return lat, lon
+    try:
+        response = requests.get(BASE_URL, params=params, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+
+        # If no results found → return None
+        if data.get("found") == 0:
+            return None
+
+        result = data["results"][0]  # Take first match
+
+        return {
+            "latitude": float(result["LATITUDE"]),
+            "longitude": float(result["LONGITUDE"]),
+            "building": result.get("BUILDING", ""),
+            "block": result.get("BLOCK", ""),
+            "road_name": result.get("ROAD_NAME", ""),
+            "postal_code": result.get("POSTAL", ""),
+            "full_address": result.get("ADDRESS", "")
+        }
+
+    except requests.RequestException as e:
+        print("OneMap API error:", e)
+        return None

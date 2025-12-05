@@ -33,23 +33,24 @@ ON users(username);
 """)
 
         # -----------------------------
-        # 2. Create prediction history (HDB version)
+        # 2. Create prediction history
         # -----------------------------
         db.execute("""
 CREATE TABLE IF NOT EXISTS predictions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-    -- COMMON FIELDS
+    -- COMMON
     mode TEXT,
 
-    -- BASIC MODE
-    town TEXT,
+    -- UNIFIED LOCATION FIELD
+    area TEXT,                  -- <--- NEW (replaces town + street_name)
+
+    -- SHARED FIELDS
     flat_type TEXT,
     floor_area_sqm REAL,
     remaining_lease REAL,
 
-    -- PRECISE MODE
-    street_name TEXT,
+    -- PRECISE MODE FIELDS
     storey_range TEXT,
     address TEXT,
     latitude REAL,
