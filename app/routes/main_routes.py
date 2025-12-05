@@ -142,14 +142,25 @@ def predict():
 
     temp_result = request.args.get("temp_result")
     active_mode = request.args.get("mode", "precise")
-    records = PredictionHistory.get_all(user_id) if user_logged_in else None
+    ppsqm = request.args.get("ppsqm")
+
+    records = PredictionHistory.get_all(user_id) if user_logged_in else []
+
+    # Option A: Reverse list so oldest → newest
+    records = list(reversed(records))
+
+    # Assign sequential IDs starting from 1
+    indexed_records = []
+    for i, r in enumerate(records, start=1):
+        r["user_index"] = i
+        indexed_records.append(r)
 
     return render_template(
         "predict.html",
         result=temp_result,
-        ppsqm=request.args.get("ppsqm"),
+        ppsqm=ppsqm,
         insights=insights,
-        records=records,
+        records=indexed_records,
         user_logged_in=user_logged_in,
         active_mode=active_mode,
     )
