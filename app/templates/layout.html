@@ -4,7 +4,7 @@
 <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>
 <head>
   <meta charset="UTF-8">
-  <title>{{ title or "Property Price ML" }}</title>
+  <title>{{ title or "Precision Property Analytics" }}</title>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -136,8 +136,22 @@
                transition-all duration-300">
         
         <!-- Logo (LEFT) -->
-        <div class="text-lg font-semibold tracking-tight">
-          PPML
+        <div class="flex items-center gap-2">
+          <svg
+            class="h-9 w-9"
+            viewBox="0 0 40 40"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <circle cx="20" cy="20" r="20" fill="#CAB37A" />
+            <circle cx="20" cy="20" r="12" fill="white" fill-opacity="0.92" />
+            <circle cx="20" cy="20" r="4" fill="#111827" />
+          </svg>
+
+          <span class="font-semibold tracking-tight">
+            PPA
+          </span>
         </div>
 
         <!-- Nav Links (RIGHT) -->
@@ -179,6 +193,63 @@
   </main>
 
 
+
+  <!-- ================================
+       PROFESSIONAL FOOTER (OPTION 1)
+  ================================= -->
+  <footer class="border-t border-gray-200/40 mt-20 pt-14 pb-10 text-gray-700 bg-white/40 backdrop-blur-sm">
+    <div class="max-w-[90rem] mx-auto px-6">
+
+      <!-- Top Row: Left brand / Right copyright -->
+      <div class="flex flex-wrap justify-between items-start gap-10">
+
+        <!-- LEFT: Brand -->
+        <div class="max-w-lg">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="flex items-center gap-3 mb-3">
+              <svg
+                class="h-9 w-9"
+                viewBox="0 0 40 40"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <circle cx="20" cy="20" r="20" fill="#CAB37A" />
+                <circle cx="20" cy="20" r="12" fill="white" fill-opacity="0.92" />
+                <circle cx="20" cy="20" r="4" fill="#111827" />
+              </svg>
+
+              <div class="font-semibold tracking-wide uppercase text-[0.92rem]">
+                Precision Property Analytics
+              </div>
+            </div>
+          </div>
+
+          <p class="text-sm text-gray-600">
+            Understand your home’s value with precision.
+          </p>
+        </div>
+
+        <!-- RIGHT: Copyright + Disclaimer -->
+        <div class="max-w-xl mt-4 text-xs text-gray-500 leading-relaxed">
+          <p>© 2025 Precision Property Analytics. All rights reserved.</p>
+
+          <p class="mt-2">
+            Estimates are generated using public housing datasets and proprietary
+            machine-learned models. Actual market valuations may differ.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Divider -->
+      <div class="border-t border-gray-200/60 mt-10"></div>
+
+    </div>
+  </footer>
+
+
+
   <!-- Navbar scroll behaviour -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -210,5 +281,6 @@
       }
     });
   </script>
+
 </body>
 </html>
