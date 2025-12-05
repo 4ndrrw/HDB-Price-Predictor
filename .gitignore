@@ -66,7 +66,7 @@ desktop.ini
 #############################################
 # Model Files
 #############################################
-app/ml/*.pkl
+app/ml/rf_model_basic.pkl
 
 # ...but KEEP all your .pkl model files (no ignoring)
 # (Remove the ignore rule entirely)
