@@ -176,6 +176,16 @@
               Invalid address — please enter a valid Singapore address.
             </div>
 
+          {% elif error == "invalid_area" %}
+            <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              Floor area must be between 30 and 200m².
+            </div>
+
+          {% elif error == "invalid_lease" %}
+            <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              Remaining lease must be between 55 and 99 years.
+            </div>
+
           {% endif %}
 
         </div>
@@ -526,47 +536,47 @@
     ALPINE DROPDOWN SCRIPT FOR TOWN SELECTION
 =============================================================== -->
 <script>
-function hdbTownSelect() {
-  return {
-    open: false,
-    query: "",
-    selected: "",
-    highlighted: 0,
+  function hdbTownSelect() {
+    return {
+      open: false,
+      query: "",
+      selected: "",
+      highlighted: 0,
 
-    towns: [
-      "Ang Mo Kio", "Bedok", "Bishan", "Bukit Batok", "Bukit Merah", "Bukit Panjang",
-      "Bukit Timah", "Choa Chu Kang", "Clementi", "Geylang", "Hougang", "Jurong East",
-      "Jurong West", "Kallang/Whampoa", "Marine Parade", "Queenstown", "Sembawang",
-      "Sengkang", "Serangoon", "Tampines", "Toa Payoh", "Woodlands", "Yishun"
-    ],
+      towns: [
+        "Ang Mo Kio", "Bedok", "Bishan", "Bukit Batok", "Bukit Merah", "Bukit Panjang",
+        "Bukit Timah", "Choa Chu Kang", "Clementi", "Geylang", "Hougang", "Jurong East",
+        "Jurong West", "Kallang/Whampoa", "Marine Parade", "Queenstown", "Sembawang",
+        "Sengkang", "Serangoon", "Tampines", "Toa Payoh", "Woodlands", "Yishun"
+      ],
 
-    get filtered() {
-      const q = this.query.trim().toLowerCase();
-      if (!q) return this.towns;
-      return this.towns.filter(t => t.toLowerCase().includes(q));
-    },
+      get filtered() {
+        const q = this.query.trim().toLowerCase();
+        if (!q) return this.towns;
+        return this.towns.filter(t => t.toLowerCase().includes(q));
+      },
 
-    choose(town) {
-      this.selected = town;
-      this.query = town;
-      this.open = false;
-    },
+      choose(town) {
+        this.selected = town;
+        this.query = town;
+        this.open = false;
+      },
 
-    highlightNext() {
-      if (this.highlighted < this.filtered.length - 1) this.highlighted++;
-    },
+      highlightNext() {
+        if (this.highlighted < this.filtered.length - 1) this.highlighted++;
+      },
 
-    highlightPrev() {
-      if (this.highlighted > 0) this.highlighted--;
-    },
+      highlightPrev() {
+        if (this.highlighted > 0) this.highlighted--;
+      },
 
-    selectHighlighted() {
-      if (this.filtered.length > 0) {
-        this.choose(this.filtered[this.highlighted]);
-      }
-    },
-  };
-}
+      selectHighlighted() {
+        if (this.filtered.length > 0) {
+          this.choose(this.filtered[this.highlighted]);
+        }
+      },
+    };
+  }
 </script>
 
 
@@ -574,28 +584,28 @@ function hdbTownSelect() {
     ALPINE DROPDOWN SCRIPT FOR STOREY SELECTION
 =============================================================== -->
 <script>
-function storeySelect() {
-  return {
-    open: false,
-    selectedLabel: "",
-    selectedRaw: "",
+  function storeySelect() {
+    return {
+      open: false,
+      selectedLabel: "",
+      selectedRaw: "",
 
-    options: [
-      { label: "01–05", raw: "01 TO 03" },
-      { label: "06–10", raw: "07 TO 09" },
-      { label: "11–15", raw: "13 TO 15" },
-      { label: "16–20", raw: "16 TO 18" },
-      { label: "21–25", raw: "22 TO 24" },
-      { label: "26–30", raw: "28 TO 30" }
-    ],
+      options: [
+        { label: "01–05", raw: "01 TO 03" },
+        { label: "06–10", raw: "07 TO 09" },
+        { label: "11–15", raw: "13 TO 15" },
+        { label: "16–20", raw: "16 TO 18" },
+        { label: "21–25", raw: "22 TO 24" },
+        { label: "26–30", raw: "28 TO 30" }
+      ],
 
-    select(opt) {
-      this.selectedLabel = opt.label;
-      this.selectedRaw = opt.raw;
-      this.open = false;
-    }
-  };
-}
+      select(opt) {
+        this.selectedLabel = opt.label;
+        this.selectedRaw = opt.raw;
+        this.open = false;
+      }
+    };
+  }
 </script>
 
 
@@ -649,115 +659,115 @@ function storeySelect() {
     HISTORY TABLE SCRIPT WITH PAGINATION + CSV EXPORT
 =============================================================== -->
 {% if user_logged_in %}
-<script>
-document.addEventListener("DOMContentLoaded", () => {
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
 
-  // ------------------------------------------
-  // 1) BUILD CLEAN ROW OBJECTS FROM BACKEND
-  // ------------------------------------------
-  let rows = [
-    {% for r in records %}
-      {
-        location: "{{ r.location }}",      // <-- unified final field
-        area_sqm: "{{ r.floor_area_sqm }}",
-        flat_type: "{{ r.flat_type }}",
-        storey: "{{ r.storey_range if r.mode == 'precise' else '—' }}",
-        lease: "{{ r.remaining_lease }}",
-        mode: "{{ r.mode }}",
-        price_raw: {{ r.predicted_price if r.predicted_price is not none else "null" }},
-        price_display: "{{ '${:,.0f}'.format(r.predicted_price|float) if r.predicted_price else '—' }}"
-      },
-    {% endfor %}
-  ];
+      // ------------------------------------------
+      // 1) BUILD CLEAN ROW OBJECTS FROM BACKEND
+      // ------------------------------------------
+      let rows = [
+        {% for r in records %}
+          {
+            location: "{{ r.location }}",      // <-- unified final field
+            area_sqm: "{{ r.floor_area_sqm }}",
+            flat_type: "{{ r.flat_type }}",
+            storey: "{{ r.storey_range if r.mode == 'precise' else '—' }}",
+            lease: "{{ r.remaining_lease }}",
+            mode: "{{ r.mode }}",
+            price_raw: {{ r.predicted_price if r.predicted_price is not none else "null" }},
+            price_display: "{{ '${:,.0f}'.format(r.predicted_price|float) if r.predicted_price else '—' }}"
+          },
+        {% endfor %}
+      ];
 
-  // ------------------------------------------
-  // PAGINATION CONFIG
-  // ------------------------------------------
-  const rowsPerPage = 8;
-  let currentPage = 1;
+      // ------------------------------------------
+      // PAGINATION CONFIG
+      // ------------------------------------------
+      const rowsPerPage = 8;
+      let currentPage = 1;
 
-  const tableBody = document.getElementById("historyBody");
-  const prevBtn   = document.getElementById("prevPage");
-  const nextBtn   = document.getElementById("nextPage");
-  const pageLabel = document.getElementById("pageLabel");
-  const downloadBtn = document.getElementById("downloadCsv");
+      const tableBody = document.getElementById("historyBody");
+      const prevBtn   = document.getElementById("prevPage");
+      const nextBtn   = document.getElementById("nextPage");
+      const pageLabel = document.getElementById("pageLabel");
+      const downloadBtn = document.getElementById("downloadCsv");
 
-  // ------------------------------------------
-  // RENDER TABLE
-  // ------------------------------------------
-  function renderTable() {
-    const start = (currentPage - 1) * rowsPerPage;
-    const items = rows.slice(start, start + rowsPerPage);
+      // ------------------------------------------
+      // RENDER TABLE
+      // ------------------------------------------
+      function renderTable() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const items = rows.slice(start, start + rowsPerPage);
 
-    tableBody.innerHTML = "";
+        tableBody.innerHTML = "";
 
-    items.forEach(r => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td class="px-4 py-3">${r.location}</td>
-        <td class="px-4 py-3">${r.area_sqm}</td>
-        <td class="px-4 py-3">${r.flat_type}</td>
-        <td class="px-4 py-3">${r.storey}</td>
-        <td class="px-4 py-3">${r.lease}</td>
-        <td class="px-4 py-3">
-          ${r.mode === "precise"
-            ? '<span class="px-2 py-1 text-xs bg-black text-white rounded">Precise</span>'
-            : '<span class="px-2 py-1 text-xs bg-gray-700 text-white rounded">Basic</span>'}
-        </td>
-        <td class="px-4 py-3 font-semibold">${r.price_display}</td>
-      `;
-      tableBody.appendChild(tr);
+        items.forEach(r => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="px-4 py-3">${r.location}</td>
+            <td class="px-4 py-3">${r.area_sqm}</td>
+            <td class="px-4 py-3">${r.flat_type}</td>
+            <td class="px-4 py-3">${r.storey}</td>
+            <td class="px-4 py-3">${r.lease}</td>
+            <td class="px-4 py-3">
+              ${r.mode === "precise"
+                ? '<span class="px-2 py-1 text-xs bg-black text-white rounded">Precise</span>'
+                : '<span class="px-2 py-1 text-xs bg-gray-700 text-white rounded">Basic</span>'}
+            </td>
+            <td class="px-4 py-3 font-semibold">${r.price_display}</td>
+          `;
+          tableBody.appendChild(tr);
+        });
+
+        updatePaginationControls();
+      }
+
+      // ------------------------------------------
+      // PAGINATION
+      // ------------------------------------------
+      function updatePaginationControls() {
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
+        pageLabel.textContent = `Page ${currentPage} of ${totalPages}`;
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
+      }
+
+      prevBtn.addEventListener("click", () => {
+        currentPage--;
+        renderTable();
+      });
+
+      nextBtn.addEventListener("click", () => {
+        currentPage++;
+        renderTable();
+      });
+
+      // ------------------------------------------
+      // CSV EXPORT
+      // ------------------------------------------
+      downloadBtn.addEventListener("click", () => {
+        let csv = "Location,Area_sqm,Flat Type,Storey,Lease,Mode,Price\n";
+        rows.forEach(r => {
+          csv += `${r.location},${r.area_sqm},${r.flat_type},${r.storey},${r.lease},${r.mode},${r.price_raw}\n`;
+        });
+
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "hdb_predictions.csv";
+        a.click();
+
+        URL.revokeObjectURL(url);
+      });
+
+      // ------------------------------------------
+      // INITIAL RENDER
+      // ------------------------------------------
+      renderTable();
     });
-
-    updatePaginationControls();
-  }
-
-  // ------------------------------------------
-  // PAGINATION
-  // ------------------------------------------
-  function updatePaginationControls() {
-    const totalPages = Math.ceil(rows.length / rowsPerPage);
-    pageLabel.textContent = `Page ${currentPage} of ${totalPages}`;
-    prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = currentPage === totalPages;
-  }
-
-  prevBtn.addEventListener("click", () => {
-    currentPage--;
-    renderTable();
-  });
-
-  nextBtn.addEventListener("click", () => {
-    currentPage++;
-    renderTable();
-  });
-
-  // ------------------------------------------
-  // CSV EXPORT
-  // ------------------------------------------
-  downloadBtn.addEventListener("click", () => {
-    let csv = "Location,Area_sqm,Flat Type,Storey,Lease,Mode,Price\n";
-    rows.forEach(r => {
-      csv += `${r.location},${r.area_sqm},${r.flat_type},${r.storey},${r.lease},${r.mode},${r.price_raw}\n`;
-    });
-
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "hdb_predictions.csv";
-    a.click();
-
-    URL.revokeObjectURL(url);
-  });
-
-  // ------------------------------------------
-  // INITIAL RENDER
-  // ------------------------------------------
-  renderTable();
-});
-</script>
+  </script>
 {% endif %}
 
 

@@ -51,13 +51,21 @@ def predict():
             if any(is_empty(f) for f in required):
                 return redirect("/predict?error=missing_basic&mode=basic")
 
-            # prepare_basic_input now returns (X, meta)
+            # ---- Validate ranges ----
+            area = float(form.get("floor_area_sqm"))
+            lease = float(form.get("remaining_lease"))
+
+            if not (30 <= area <= 200):
+                return redirect("/predict?error=invalid_area&mode=basic")
+
+            if not (55 <= lease <= 99):
+                return redirect("/predict?error=invalid_lease&mode=basic")
+
+            # prepare_basic_input returns (X, meta)
             X, meta = prepare_basic_input(form)
 
-            # Run prediction
             result = basic_model.predict(X)[0]
 
-            # Save to history
             if user_logged_in:
                 meta["mode"] = "basic"
                 PredictionHistory.save(meta, result)
@@ -66,26 +74,34 @@ def predict():
         # PRECISE MODE
         # =====================================================
         elif mode == "precise":
-            required = ["storey_range", "flat_type", "floor_area_sqm", "remaining_lease", "address"]
+            required = ["storey_range", "flat_type", "floor_area_sqm",
+                        "remaining_lease", "address"]
+
             if any(is_empty(f) for f in required):
                 return redirect("/predict?error=missing_precise&mode=precise")
+
+            # ---- Validate ranges ----
+            area = float(form.get("floor_area_sqm"))
+            lease = float(form.get("remaining_lease"))
+
+            if not (30 <= area <= 200):
+                return redirect("/predict?error=invalid_area&mode=precise")
+
+            if not (55 <= lease <= 99):
+                return redirect("/predict?error=invalid_lease&mode=precise")
 
             # Prepare precise input
             X, meta = prepare_precise_input(form)
 
-            # ❌ INVALID ADDRESS — STOP
+            # Invalid address caught via preprocess
             if X is None and meta == "invalid":
                 return redirect("/predict?error=invalid_address&mode=precise")
 
-            # Run prediction
             result = precise_model.predict(X)[0]
 
             if user_logged_in:
                 meta["mode"] = "precise"
                 PredictionHistory.save(meta, result)
-
-        # After prediction → redirect (PRG)
-        return redirect(f"/predict?temp_result={result}&mode={mode}")
 
     # -----------------------------
     # GET → render page
