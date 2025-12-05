@@ -63,11 +63,6 @@ desktop.ini
 # KEEP your training dataset:
 !app/ml/data/London Property Listings Dataset.csv
 
-#############################################
-# Model Files
-#############################################
-app/ml/rf_model_basic.pkl
-
 # ...but KEEP all your .pkl model files (no ignoring)
 # (Remove the ignore rule entirely)
 # So do NOT ignore *.pkl at all.
