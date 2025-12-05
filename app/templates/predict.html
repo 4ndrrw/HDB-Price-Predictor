@@ -547,28 +547,42 @@
               <th class="px-4 py-3 text-left cursor-pointer select-none"
                   id="sortIdHeader">
                   ID
-                  <span id="sortArrowId" class="sort-arrow ml-1">▲</span>
+                  <span id="sortArrowId" class="sort-arrow ml-1">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M5 12 L10 7 L15 12" />
+                    </svg>
+                  </span>
               </th>
 
               <th class="px-4 py-3 text-left">Location</th>
-              <th class="px-4 py-3 text-left">Area (sqm)</th>
+              <th class="px-4 py-3 text-left">Area (m²)</th>
               <th class="px-4 py-3 text-left">Flat Type</th>
               <th class="px-4 py-3 text-left">Storey</th>
-              <th class="px-4 py-3 text-left">Lease (yrs)</th>
+              <th class="px-4 py-3 text-left">Lease (Years)</th>
               <th class="px-4 py-3 text-left">Mode</th>
 
               <!-- SORT: PRICE -->
               <th class="px-4 py-3 text-left cursor-pointer select-none"
                   id="sortPriceHeader">
                   Price
-                  <span id="sortArrowPrice" class="sort-arrow ml-1">▲</span>
+                  <span id="sortArrowPrice" class="sort-arrow ml-1 opacity-30 transition-all">
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                      <path d="M5 12 L10 7 L15 12" />
+                    </svg>
+                  </span>
               </th>
 
               <!-- SORT: PPSQM -->
               <th class="px-4 py-3 text-left cursor-pointer select-none"
                   id="sortPpsqmHeader">
                   Price per sqm
-                  <span id="sortArrowPpsqm" class="sort-arrow ml-1">▲</span>
+                  <span id="sortArrowPpsqm" class="sort-arrow ml-1 opacity-30 transition-all">
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                      <path d="M5 12 L10 7 L15 12" />
+                    </svg>
+                  </span>
               </th>
             </tr>
           </thead>
@@ -789,16 +803,20 @@
         let sortAsc = true;
 
         function resetArrows() {
-            document.getElementById("sortArrowId").style.transform = "rotate(0deg)";
-            document.getElementById("sortArrowPrice").style.transform = "rotate(0deg)";
-            document.getElementById("sortArrowPpsqm").style.transform = "rotate(0deg)";
+            ["sortArrowId", "sortArrowPrice", "sortArrowPpsqm"].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.add("inactive");
+                el.classList.remove("active");
+                el.style.transform = "rotate(0deg)";
+            });
         }
-
+       
         function rotateArrow(id, asc) {
             const el = document.getElementById(id);
+            el.classList.remove("inactive");
+            el.classList.add("active");
             el.style.transform = asc ? "rotate(0deg)" : "rotate(180deg)";
         }
-
 
         function applySort(column) {
 
@@ -849,7 +867,7 @@
         // ---------------------------------------------------------------------
         // PAGINATION
         // ---------------------------------------------------------------------
-        const rowsPerPage = 8;
+        const rowsPerPage = 10;
         let currentPage = 1;
 
         const tableBody = document.getElementById("historyBody");
@@ -963,10 +981,32 @@
     ADDITIONAL STYLES 
 =============================================================== -->
 <style>
+  th .sort-arrow {
+    display: inline-flex;
+    align-items: center;     /* vertically centers SVG with the text */
+    gap: 4px;                /* optional spacing */
+    vertical-align: middle;  /* makes sure the inline element aligns properly */
+    }
+
   .sort-arrow {
-    display: inline-block;
-    transform-origin: center;
-    transition: transform 0.25s ease;
+    display: inline-flex;
+    align-items: center;     /* vertically centers the SVG */
+    opacity: 0.3;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+
+  .sort-arrow svg {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;  /* ensures perfect alignment */
+  }
+
+  .sort-arrow.inactive {
+    opacity: 0.25;
+  }
+
+  .sort-arrow.active {
+    opacity: 1;
   }
 </style>
 {% endblock %}
