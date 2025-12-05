@@ -51,27 +51,15 @@ def predict():
             if any(is_empty(f) for f in required):
                 return redirect("/predict?error=missing_basic&mode=basic")
 
-            # prepare_basic_input RETURNS ONLY X
-            X = prepare_basic_input(form)
-
-            # Build DB metadata manually
-            meta = {
-                "mode": "basic",
-                "location": form.get("town"),  # unified field
-                "flat_type": form.get("flat_type"),
-                "floor_area_sqm": form.get("floor_area_sqm"),
-                "remaining_lease": form.get("remaining_lease"),
-                "storey_range": None,
-                "address": None,
-                "latitude": None,
-                "longitude": None,
-            }
+            # prepare_basic_input now returns (X, meta)
+            X, meta = prepare_basic_input(form)
 
             # Run prediction
             result = basic_model.predict(X)[0]
 
             # Save to history
             if user_logged_in:
+                meta["mode"] = "basic"
                 PredictionHistory.save(meta, result)
 
         # =====================================================

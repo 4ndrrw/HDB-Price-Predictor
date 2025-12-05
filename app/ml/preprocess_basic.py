@@ -2,22 +2,31 @@
 
 import pandas as pd
 
-def prepare_basic_input(form_dict):
+def prepare_basic_input(form):
+    location = (form.get("town") or "").strip()
+    flat_type = (form.get("flat_type") or "").strip()
 
-    location = (form_dict.get("town") or "").strip()
+    floor_area = float(form.get("floor_area_sqm") or 0)
+    remaining_lease = float(form.get("remaining_lease") or 0)
 
+    # Model input
     X = pd.DataFrame([{
         "location": location,
-        "flat_type": (form_dict.get("flat_type") or "").strip(),
-        "floor_area_sqm": float(form_dict.get("floor_area_sqm") or 0),
-        "remaining_lease": float(form_dict.get("remaining_lease") or 0),
+        "flat_type": flat_type,
+        "floor_area_sqm": floor_area,
+        "remaining_lease": remaining_lease
     }])
 
+    # DB metadata
     meta = {
         "location": location,
-        "flat_type": form_dict.get("flat_type"),
-        "floor_area_sqm": form_dict.get("floor_area_sqm"),
-        "remaining_lease": form_dict.get("remaining_lease"),
+        "flat_type": flat_type,
+        "floor_area_sqm": floor_area,
+        "remaining_lease": remaining_lease,
+        "storey_range": None,
+        "address": None,
+        "latitude": None,
+        "longitude": None,
     }
 
     return X, meta
