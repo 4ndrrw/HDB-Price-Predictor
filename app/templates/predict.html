@@ -539,7 +539,13 @@
           <!-- HEADER -->
           <thead class="bg-gray-200 text-gray-700 text-sm">
             <tr>
-              <th class="px-4 py-3 text-left">ID</th>
+              <th class="px-4 py-3 text-left cursor-pointer select-none"
+                  id="sortUserIdHeader">
+                  ID
+                  <span id="sortArrow" class="inline-block transition-transform ml-1 text-gray-500">
+                      ▲
+                  </span>
+              </th>
               <th class="px-4 py-3 text-left">Location</th>         <!-- area -->
               <th class="px-4 py-3 text-left">Area (sqm)</th>
               <th class="px-4 py-3 text-left">Flat Type</th>
@@ -743,20 +749,41 @@
       let rows = [
         {% for r in records %}
           {
-            user_index: "{{ r.user_index }}",
+            user_index: {{ r.user_index }},
             location: "{{ r.location }}",
             area_sqm: "{{ r.floor_area_sqm }}",
             flat_type: "{{ r.flat_type }}",
             storey: "{{ r.storey_range if r.mode == 'precise' else '—' }}",
             lease: "{{ r.remaining_lease }}",
             mode: "{{ r.mode }}",
-            price_raw: {{ r.predicted_price if r.predicted_price is not none else "null" }},
-            price_display: "{{ '${:,.0f}'.format(r.predicted_price|float) if r.predicted_price else '—' }}",
-            ppsqm_raw: {{ r.price_per_sqm if r.price_per_sqm is not none else "null" }},
-            ppsqm_display: "{{ '${:,.0f}'.format(r.price_per_sqm|float) if r.price_per_sqm else '—' }}"
+            price_raw: {{ r.predicted_price if r.predicted_price else "null" }},
+            price_display: "{{ '${:,.0f}'.format(r.predicted_price|float) if r.predicted_price else '—' }}"
           },
         {% endfor %}
       ];
+
+      // ============================================================
+      // SORTING FUNCTIONALITY (User ID Column)
+      // ============================================================
+
+      let sortAsc = true;
+
+      document.getElementById("sortUserIdHeader").addEventListener("click", () => {
+
+        // rotate arrow
+        const arrow = document.getElementById("sortArrow");
+        sortAsc = !sortAsc;
+        arrow.style.transform = sortAsc ? "rotate(0deg)" : "rotate(180deg)";
+
+        // sort rows
+        rows.sort((a, b) => {
+          return sortAsc ? a.user_index - b.user_index : b.user_index - a.user_index;
+        });
+
+        // reset to first page after sorting
+        currentPage = 1;
+        renderTable();
+      });
 
       // ------------------------------------------
       // PAGINATION CONFIG
