@@ -1,93 +1,112 @@
-# CA1-DAAA2B04-2423708-AndrewPang
+# Precision Property Analytics - HDB Resale Price Predictor
 
+## Overview
 
+Precision Property Analytics is a machine-learning-powered Flask web application designed to predict the resale prices of Singapore Housing & Development Board (HDB) flats. The application offers two intuitive valuation modes—**Basic** and **Precise**—tailored to different use cases. It leverages regression models trained on historical transaction data and engineered spatial features to deliver clean, confidence-building price predictions.
 
-## Getting started
+## Features
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+- **Intelligent Price Predictions:** Instantly evaluate property prices using:
+  - **Basic Mode:** Quick estimates based on town, flat type, area, and remaining lease.
+  - **Precise Mode:** Fine-grained, street-level accuracy incorporating full geolocations, layout configurations, and address-specific spatial features.
+- **Dynamic Context-Rich Insights:** Receive personalized market insights alongside the valuation (e.g., price-per-sqm compared to the town average, lease decay metrics, and layout desirability).
+- **Interactive UI & Fluid Experience:** A modern UI featuring data-forward visualizations, floating architectural aesthetics, and smooth transitions powered by Jinja2 and Tailwind-style utility classes.
+- **Prediction History & Accounts:** Secure user authentication allowing users to save their predictions, clear history, and browse past valuations through the dashboard.
+- **RESTful API:** Developer-friendly JSON endpoints (`/api/predict` and `/api/history`) for programmatic automated valuations.
+- **Automated Testing Suite:** End-to-end testing components using `pytest` to validate application routing, authentication, and machine learning inference logic.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Architecture & Technology Stack
 
-## Add your files
+- **Backend Framework:** Python / Flask
+- **Machine Learning:** Scikit-Learn (`joblib`), XGBoost, pandas, NumPy
+- **Database:** SQLite (with automated `init_db()` setup)
+- **Frontend / UI:** HTML5, CSS3, Tailwind-style layouts, Jinja2 Templating
+- **Testing environment:** `pytest` 
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## Directory Structure
 
+```text
+├── app/
+│   ├── ml/             # Preprocessing logic and cached Random Forest models
+│   ├── models/         # Database models/schema abstraction handlers
+│   ├── routes/         # Blueprints for Main UI, Authentication, and REST API
+│   ├── templates/      # Jinja2 frontend layouts and web interface
+│   ├── tests/          # Pytest suite 
+│   ├── utils/          # Auxiliary scripts (e.g. input validators)
+│   ├── app.py          # Flask application factory
+│   ├── config.py       # Application configurations
+│   ├── database.py     # SQLite initialization logic
+├── env/                # Virtual environment wrapper (if initialized locally)
+├── requirements.txt    # Python package dependencies
+├── run.py              # Application entry point/server script
+└── README.md           # This project documentation
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/andrewdevops/ca1-daaa2b04-2423708-andrewpang.git
-git branch -M main
-git push -uf origin main
-```
 
-## Integrate with your tools
+## Installation & Setup
 
-- [ ] [Set up project integrations](https://gitlab.com/andrewdevops/ca1-daaa2b04-2423708-andrewpang/-/settings/integrations)
+1. **Clone the repository and set up your workspace:**
+   ```bash
+   git clone <repository-url>
+   cd ca1-daaa2b04-2423708-andrewpang
+   ```
 
-## Collaborate with your team
+2. **Create and activate a Python virtual environment:**
+   ```bash
+   python -m venv env
+   # On Windows (PowerShell):
+   .\env\Scripts\activate
+   # On macOS / Linux:
+   source env/bin/activate
+   ```
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+3. **Install the required dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+   *(Note: Based on your environment, you may need to resolve any specific platform binary requirements for heavy libraries like Scipy, XGBoost, and Scikit-Learn).*
 
-## Test and Deploy
+4. **Launch the Application Server:**
+   ```bash
+   python run.py
+   ```
+   The local SQLite database (`prediction_history.db`) automatically initializes during the `create_app()` lifecycle flow structure.
 
-Use the built-in continuous integration in GitLab.
+5. **Access the application:**
+   Open your browser and navigate to `http://localhost:5000` or `http://0.0.0.0:5000`.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+6. **Run Automated Tests (Optional):**
+   ```bash
+   python -m pytest app/tests/
+   ```
 
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### 1. Web Interface (Dashboard)
+Navigate to `http://localhost:5000/predict` and use the interactive form. Select between "Basic Mode" for quick, general estimates or "Precise Mode" to feed in an exact address and retrieve location-aware ML insights.
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+### 2. Standard REST API Integration
+To query predictions directly from the inference models, send a POST request to the API:
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+**Request (`POST /api/predict`):**
+```bash
+curl -X POST http://localhost:5000/api/predict \
+     -H "Content-Type: application/json" \
+     -d '{
+       "mode": "basic",
+       "town": "ANG MO KIO",
+       "flat_type": "4 ROOM",
+       "floor_area_sqm": "90",
+       "remaining_lease": "85"
+     }'
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+**JSON Response format:**
+```json
+{
+  "mode": "basic",
+  "prediction": 485000.0
+}
+```
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Credits
+Developed for DOAA CA1 (Data Operations and Analytics Application - Continuous Assessment) by Andrew Pang.
